@@ -1,0 +1,28 @@
+{
+  "kind": "singleType",
+  "collectionName": "food_and_drink_menus",
+  "info": {
+    "singularName": "food-and-drink-menu",
+    "pluralName": "food-and-drink-menus",
+    "displayName": "Food and Drink Menu"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "layout.hero-section",
+        "layout.info-section"
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "kind": "singleType",
+  "collectionName": "hours_and_locations",
+  "info": {
+    "singularName": "hours-and-location",
+    "pluralName": "hours-and-locations",
+    "displayName": "Hours & Location"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "layout.hero-section",
+        "layout.info-section"
+      ]
+    }
+  }
+}

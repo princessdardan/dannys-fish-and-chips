@@ -1,0 +1,82 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.*
+
+# Testing
+/coverage
+
+# Production builds
+/build
+/.next/
+/out/
+/dist
+
+# Environment variables
+.env
+.env*.local
+*.env
+!.env.example
+
+# Docker
+.docker/
+*.dockerfile.dev
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.swm
+.eslintcache
+
+# Misc
+.tmp
+.cache
+.strapi
+.strapi-updater.json
+.strapi-cloud.json
+ssl
+*.pem
+.tsbuildinfo
+.vercel
+
+# Yarn
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+yarn-error.log
+
+# Strapi specific
+exports
+public/uploads/*
+!public/uploads/.gitkeep

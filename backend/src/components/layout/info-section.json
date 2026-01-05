@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_layout_info_sections",
+  "info": {
+    "displayName": "Info Section"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "subHeading": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "features": {
+      "type": "component",
+      "component": "components.info-with-media",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

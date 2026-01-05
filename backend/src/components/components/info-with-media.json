@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_components_info_with_medias",
+  "info": {
+    "displayName": "Info with Media"
+  },
+  "options": {},
+  "attributes": {
+    "media": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "videos"
+      ]
+    },
+    "heading": {
+      "type": "string"
+    },
+    "info": {
+      "type": "blocks"
+    },
+    "orientation": {
+      "type": "enumeration",
+      "default": "MEDIA_LEFT",
+      "enum": [
+        "MEDIA_LEFT",
+        "MEDIA_RIGHT",
+        "MEDIA_TOP"
+      ]
+    }
+  },
+  "config": {}
+}

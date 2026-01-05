@@ -1,0 +1,28 @@
+{
+  "kind": "singleType",
+  "collectionName": "specials",
+  "info": {
+    "singularName": "special",
+    "pluralName": "specials",
+    "displayName": "Special"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "layout.hero-section",
+        "layout.info-section"
+      ]
+    }
+  }
+}

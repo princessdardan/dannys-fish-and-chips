@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_layout_hero_sections",
+  "info": {
+    "displayName": "Hero Section"
+  },
+  "options": {},
+  "attributes": {
+    "onHomepage": {
+      "type": "boolean"
+    },
+    "media": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "videos"
+      ]
+    },
+    "heading": {
+      "type": "string"
+    },
+    "subHeading": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "link": {
+      "type": "component",
+      "component": "components.link",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

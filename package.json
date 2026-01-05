@@ -1,0 +1,26 @@
+{
+  "name": "dannys-fish-and-chips",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build:all": "cd backend && npm run build && cd ../frontend && npm run build",
+    "docker:dev": "docker-compose up",
+    "docker:dev:build": "docker-compose up --build",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "docker:prod:build": "docker-compose -f docker-compose.prod.yml up -d --build",
+    "docker:down": "docker-compose down",
+    "docker:down:prod": "docker-compose -f docker-compose.prod.yml down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:logs:prod": "docker-compose -f docker-compose.prod.yml logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "dependencies": {
+    "as": "^0.4.1"
+  }
+}
