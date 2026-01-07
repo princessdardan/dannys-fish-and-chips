@@ -48,6 +48,21 @@ jobs:
     name: Frontend CI
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: strapi
+          POSTGRES_PASSWORD: strapi
+          POSTGRES_DB: strapi
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     defaults:
       run:
         working-directory: ./frontend
@@ -63,8 +78,46 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
         run: npm ci
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Start Strapi backend
+        working-directory: ./backend
+        run: npm run develop &
+        env:
+          NODE_ENV: development
+          HOST: 0.0.0.0
+          PORT: 1337
+          APP_KEYS: test-key-1,test-key-2,test-key-3,test-key-4
+          API_TOKEN_SALT: test-token-salt
+          ADMIN_JWT_SECRET: test-admin-secret
+          TRANSFER_TOKEN_SALT: test-transfer-salt
+          JWT_SECRET: test-jwt-secret
+          DATABASE_CLIENT: postgres
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: strapi
+          DATABASE_USERNAME: strapi
+          DATABASE_PASSWORD: strapi
+          DATABASE_SSL: false
+
+      - name: Wait for Strapi to be ready
+        run: |
+          echo "Waiting for Strapi to start..."
+          for i in {1..60}; do
+            if curl -f http://localhost:1337/_health > /dev/null 2>&1; then
+              echo "Strapi is ready!"
+              exit 0
+            fi
+            echo "Attempt $i: Strapi not ready yet..."
+            sleep 2
+          done
+          echo "Strapi failed to start within 120 seconds"
+          exit 1
 
       - name: Run linter
         run: npm run lint
