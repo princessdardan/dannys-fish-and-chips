@@ -17,8 +17,7 @@ A modern full-stack web application for Danny's Fish and Chips restaurant, built
 - [SQLite](https://www.sqlite.org/) - Development database
 
 **DevOps:**
-- [Docker](https://www.docker.com/) - Containerization
-- [Docker Compose](https://docs.docker.com/compose/) - Multi-container orchestration
+- [Vercel](https://vercel.com/) - Deployment platform
 - [GitHub Actions](https://github.com/features/actions) - CI/CD pipeline
 
 ## Features
@@ -28,14 +27,13 @@ A modern full-stack web application for Danny's Fish and Chips restaurant, built
 - Responsive design with Tailwind CSS
 - Type-safe development with TypeScript
 - RESTful API communication
-- Docker support for development and production
 - Automated testing and builds via CI/CD
+- Easy deployment to Vercel
 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
 - [Node.js 18+](https://nodejs.org/) and npm
-- [Docker](https://www.docker.com/get-started) and Docker Compose (optional, for containerized development)
 - [Git](https://git-scm.com/)
 
 ## Quick Start
@@ -88,8 +86,6 @@ NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
 
 ### 4. Run Development Servers
 
-**Option A: Without Docker**
-
 ```bash
 npm run dev
 ```
@@ -97,14 +93,6 @@ npm run dev
 This runs both frontend and backend concurrently:
 - Frontend: http://localhost:3000
 - Backend/Strapi Admin: http://localhost:1337/admin
-
-**Option B: With Docker**
-
-```bash
-npm run docker:dev
-```
-
-This will start all services in containers including PostgreSQL.
 
 ### 5. Access the Applications
 
@@ -139,8 +127,6 @@ dannys-fish-and-chips/
 ├── .github/              # GitHub configuration
 │   └── workflows/       # CI/CD workflows
 │
-├── docker-compose.yml           # Development containers
-├── docker-compose.prod.yml      # Production containers
 ├── .gitignore                   # Git ignore rules
 ├── package.json                 # Root scripts
 ├── README.md                    # This file
@@ -155,10 +141,6 @@ dannys-fish-and-chips/
 - `npm run dev:frontend` - Run only frontend
 - `npm run install:all` - Install all dependencies
 - `npm run build:all` - Build both applications
-- `npm run docker:dev` - Start development environment with Docker
-- `npm run docker:dev:build` - Rebuild and start development environment
-- `npm run docker:prod` - Start production environment with Docker
-- `npm run docker:down` - Stop all Docker containers
 
 ### Backend (`cd backend`)
 - `npm run dev` - Start Strapi in development mode
@@ -227,40 +209,11 @@ dannys-fish-and-chips/
    git push origin feature/your-feature-name
    ```
 
-## Docker Development
-
-The project includes Docker support for consistent development and production environments.
-
-### Development with Docker
-
-```bash
-# Start all services
-npm run docker:dev
-
-# Rebuild containers
-npm run docker:dev:build
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-npm run docker:down
-```
-
-### Services
-
-- **postgres**: PostgreSQL 15 database
-- **backend**: Strapi CMS (port 1337)
-- **frontend**: Next.js app (port 3000)
-
 ## Deployment
 
 For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-Quick deployment options:
-- Docker Compose on VPS
-- Manual deployment with PM2
-- Containerized deployment on cloud platforms
+This project is designed to be deployed to Vercel for both frontend and backend, with a managed PostgreSQL database (Neon, Supabase, or Railway recommended).
 
 ## Contributing
 
@@ -282,22 +235,11 @@ lsof -i :3000  # or :1337
 # Kill the process or change ports in your environment variables
 ```
 
-### Docker issues
-
-```bash
-# Clean up Docker resources
-docker-compose down -v
-docker system prune -a
-
-# Rebuild from scratch
-npm run docker:dev:build
-```
-
 ### Database connection issues
 
-- Ensure PostgreSQL is running (if using Docker, check `docker-compose ps`)
 - Verify database credentials in `.env`
-- Check database logs: `docker-compose logs postgres`
+- For development, SQLite is used by default (no setup required)
+- For production with PostgreSQL, ensure your database service is running and accessible
 
 ## License
 
