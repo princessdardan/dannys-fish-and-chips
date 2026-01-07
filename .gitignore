@@ -83,3 +83,5 @@ yarn-error.log
 exports
 public/uploads/*
 !public/uploads/.gitkeep
+ARCHITECTURE.md
+DEPLOYMENT.md

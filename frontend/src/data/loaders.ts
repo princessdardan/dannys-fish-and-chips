@@ -19,40 +19,77 @@ import { getStrapiURL } from "@/lib/utils";
 
 const baseUrl = getStrapiURL();
 
-async function getHomePageData(): Promise<TStrapiResponse<THomePage>> {
-  const query = qs.stringify({
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
+// Standard populate configuration for pages with hero + info sections
+const STANDARD_BLOCKS_POPULATE = {
+  blocks: {
+    on: {
+      "layout.hero-section": {
+        populate: {
+          media: {
+            populate: true,
+          },
+          link: {
+            populate: true,
+          },
+        },
+      },
+      "layout.info-section": {
+        populate: {
+          features: {
             populate: {
               media: {
                 populate: true,
-              },
-              link: {
-                populate: true,
-              },
-            },
-          },
-          "layout.info-section": {
-            populate: {
-              features: {
-                populate: {
-                  media: {
-                    populate: true,
-                  },
-                },
               },
             },
           },
         },
       },
     },
-  });
+  },
+};
 
-  const url = new URL("/api/home-page", baseUrl);
+// Gallery page populate configuration (hero + gallery section)
+const GALLERY_BLOCKS_POPULATE = {
+  blocks: {
+    on: {
+      "layout.hero-section": {
+        populate: {
+          media: {
+            populate: true,
+          },
+          link: {
+            populate: true,
+          },
+        },
+      },
+      "layout.gallery-section": {
+        populate: {
+          images: {
+            populate: true,
+          },
+        },
+      },
+    },
+  },
+};
+
+/**
+ * Generic page data loader
+ * @param endpoint - API endpoint (e.g., "home-page", "about-us")
+ * @param populateConfig - Populate configuration (defaults to STANDARD_BLOCKS_POPULATE)
+ */
+async function loadPageData<T>(
+  endpoint: string,
+  populateConfig: typeof STANDARD_BLOCKS_POPULATE | typeof GALLERY_BLOCKS_POPULATE = STANDARD_BLOCKS_POPULATE
+): Promise<TStrapiResponse<T>> {
+  const query = qs.stringify({ populate: populateConfig });
+  const url = new URL(`/api/${endpoint}`, baseUrl);
   url.search = query;
-  return api.get<THomePage>(url.href);
+  return api.get<T>(url.href);
+}
+
+async function getHomePageData(): Promise<TStrapiResponse<THomePage>> {
+  return loadPageData<THomePage>("home-page");
 }
 
 async function getMainMenuData(): Promise<TStrapiResponse<TMainMenu>> {
@@ -110,215 +147,27 @@ async function getMetaData(): Promise<TStrapiResponse<TMetaData>> {
 }
 
 async function getAboutUsData(): Promise<TStrapiResponse<TAboutUs>> {
-  const query = qs.stringify({
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
-            populate: {
-              media: {
-                populate: true,
-              },
-              link: {
-                populate: true,
-              },
-            },
-          },
-          "layout.info-section": {
-            populate: {
-              features: {
-                populate: {
-                  media: {
-                    populate: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const url = new URL("/api/about-us", baseUrl);
-  url.search = query;
-  return api.get<TAboutUs>(url.href);
+  return loadPageData<TAboutUs>("about-us");
 }
 
 async function getContactUsData(): Promise<TStrapiResponse<TContactUs>> {
-  const query = qs.stringify({
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
-            populate: {
-              media: {
-                populate: true,
-              },
-              link: {
-                populate: true,
-              },
-            },
-          },
-          "layout.info-section": {
-            populate: {
-              features: {
-                populate: {
-                  media: {
-                    populate: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const url = new URL("/api/contact-us", baseUrl);
-  url.search = query;
-  return api.get<TContactUs>(url.href);
+  return loadPageData<TContactUs>("contact-us");
 }
 
 async function getFoodAndDrinkMenuData(): Promise<TStrapiResponse<TFoodAndDrinkMenu>> {
-  const query = qs.stringify({
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
-            populate: {
-              media: {
-                populate: true,
-              },
-              link: {
-                populate: true,
-              },
-            },
-          },
-          "layout.info-section": {
-            populate: {
-              features: {
-                populate: {
-                  media: {
-                    populate: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const url = new URL("/api/food-and-drink-menu", baseUrl);
-  url.search = query;
-  return api.get<TFoodAndDrinkMenu>(url.href);
+  return loadPageData<TFoodAndDrinkMenu>("food-and-drink-menu");
 }
 
 async function getGalleryData(): Promise<TStrapiResponse<TGallery>> {
-  const query = qs.stringify({
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
-            populate: {
-              media: {
-                populate: true,
-              },
-              link: {
-                populate: true,
-              },
-            },
-          },
-          "layout.gallery-section": {
-            populate: {
-              images: {
-                populate: true,
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const url = new URL("/api/gallery", baseUrl);
-  url.search = query;
-  return api.get<TGallery>(url.href);
+  return loadPageData<TGallery>("gallery", GALLERY_BLOCKS_POPULATE);
 }
 
 async function getHoursAndLocationData(): Promise<TStrapiResponse<THoursAndLocation>> {
-  const query = qs.stringify({
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
-            populate: {
-              media: {
-                populate: true,
-              },
-              link: {
-                populate: true,
-              },
-            },
-          },
-          "layout.info-section": {
-            populate: {
-              features: {
-                populate: {
-                  media: {
-                    populate: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const url = new URL("/api/hours-and-location", baseUrl);
-  url.search = query;
-  return api.get<THoursAndLocation>(url.href);
+  return loadPageData<THoursAndLocation>("hours-and-location");
 }
 
 async function getSpecialData(): Promise<TStrapiResponse<TSpecial>> {
-  const query = qs.stringify({
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
-            populate: {
-              media: {
-                populate: true,
-              },
-              link: {
-                populate: true,
-              },
-            },
-          },
-          "layout.info-section": {
-            populate: {
-              features: {
-                populate: {
-                  media: {
-                    populate: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const url = new URL("/api/special", baseUrl);
-  url.search = query;
-  return api.get<TSpecial>(url.href);
+  return loadPageData<TSpecial>("special");
 }
 
 export const loaders = {

@@ -1,9 +1,8 @@
 import { IMainMenuItems } from "@/app/(site)/main-menu";
-import { TBlocks } from "@/app/(site)/page";
 import { IHeroSectionProps } from "@/components/custom/layout/hero-section";
 import { IInfoSectionProps } from "@/components/custom/layout/info-section";
 
-export type { IHeroSectionProps };
+export type { IHeroSectionProps, IInfoSectionProps };
 
 
 // Strapi Block Rich Text Types
@@ -156,7 +155,7 @@ export type THomePage = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: TBlocks[];
+  blocks: (IHeroSectionProps | IInfoSectionProps)[];
 };
 
 export type THeader = {
@@ -291,6 +290,12 @@ export interface IGallerySectionProps {
   description: string;
   images: TImage[];
 }
+
+// Union type for all layout blocks
+export type LayoutBlock =
+  | IHeroSectionProps
+  | IInfoSectionProps
+  | IGallerySectionProps;
 
 export type TStrapiResponse<T = null> = {
   success: boolean;

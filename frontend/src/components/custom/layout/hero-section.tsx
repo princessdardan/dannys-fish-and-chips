@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export interface IHeroSectionProps {
   id: number;
   documentId: string;
-  __component: string;
+  __component: "layout.hero-section";
   heading: string;
   subHeading: string;
   description: string;

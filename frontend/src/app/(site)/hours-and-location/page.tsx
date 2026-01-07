@@ -1,31 +1,16 @@
 import { loaders } from "@/data/loaders";
 import { validateApiResponse } from "@/lib/error-handler";
-import { HeroSection } from "@/components/custom/layout/hero-section";
-import { IInfoSectionProps } from "@/components/custom/layout/info-section";
-import { NewspaperInfoSection } from "@/components/custom/layout/newspaper-info-section";
-import { IHeroSectionProps, THoursAndLocationPageBlocks } from "@/types";
+import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
 
 export const revalidate = 1800;
-
-function blockRenderer(block: THoursAndLocationPageBlocks, index: number) {
-  switch (block.__component) {
-    case "layout.hero-section":
-      return <HeroSection key={index} data={block as IHeroSectionProps} />;
-    case "layout.info-section":
-      return <NewspaperInfoSection key={index} data={block as IInfoSectionProps} />;
-    default:
-      return null;
-  }
-}
 
 export default async function HoursAndLocationPage() {
   const hoursAndLocationData = await loaders.getHoursAndLocationData();
   const data = validateApiResponse(hoursAndLocationData, "hours and location");
-  const { blocks } = data;
 
   return (
     <main>
-      {blocks.map((block, index) => blockRenderer(block, index))}
+      {renderLayoutBlocks({ blocks: data.blocks, pageContext: "hours-and-location" })}
     </main>
   );
 }

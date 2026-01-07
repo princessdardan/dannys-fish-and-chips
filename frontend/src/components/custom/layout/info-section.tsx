@@ -14,7 +14,7 @@ export interface IInfoWithMedia {
 export interface IInfoSectionProps {
     id: number;
     documentId: string;
-    __component: string;
+    __component: "layout.info-section";
     heading: string;
     subHeading?: string;
     description?: string;
