@@ -13,6 +13,7 @@ export type BlocksContent = Array<
   | QuoteBlock
   | CodeBlock
   | ImageBlock
+  | VideoBlock
   | LinkBlock
 >;
 
@@ -58,6 +59,28 @@ export interface ImageBlock {
     width: number;
     height: number;
     formats?: Record<string, unknown>;
+    hash: string;
+    ext: string;
+    mime: string;
+    size: number;
+    previewUrl?: string | null;
+    provider: string;
+    provider_metadata?: unknown;
+    createdAt: string;
+    updatedAt: string;
+  };
+  children: [{ type: "text"; text: "" }];
+}
+
+export interface VideoBlock {
+  type: "video";
+  video: {
+    name: string;
+    alternativeText?: string | null;
+    url: string;
+    caption?: string | null;
+    width: number;
+    height: number;
     hash: string;
     ext: string;
     mime: string;

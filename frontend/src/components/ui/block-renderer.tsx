@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Check } from "lucide-react";
 import { BlocksContent, InlineNode } from "@/types";
 import { getStrapiMedia } from "@/components/ui/strapi-image";
+import { getStrapiVideo } from "@/components/ui/strapi-video";
 
 interface BlockRendererProps {
   content: BlocksContent;
@@ -136,6 +137,30 @@ export function BlockRenderer({ content }: BlockRendererProps) {
                 {block.image.caption && (
                   <figcaption className="mt-2 text-center text-sm text-gray-600">
                     {block.image.caption}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          }
+
+          case "video": {
+            const videoUrl = getStrapiVideo(block.video.url);
+            if (!videoUrl) return null;
+
+            return (
+              <figure key={index} className="my-4">
+                <video
+                  src={videoUrl}
+                  controls
+                  className="rounded w-full"
+                  width={block.video.width}
+                  height={block.video.height}
+                >
+                  Your browser does not support the video tag.
+                </video>
+                {block.video.caption && (
+                  <figcaption className="mt-2 text-center text-sm text-gray-600">
+                    {block.video.caption}
                   </figcaption>
                 )}
               </figure>
