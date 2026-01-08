@@ -21,6 +21,7 @@ export default ({ env }) => ({
     config: {
       provider: 'aws-s3',
       providerOptions: {
+        baseUrl: env('S3_BASE_URL'),
         s3Options: {
           endpoint: env('S3_ENDPOINT'),
           region: env('S3_REGION'),

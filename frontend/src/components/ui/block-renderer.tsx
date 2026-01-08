@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Check } from "lucide-react";
 import { BlocksContent, InlineNode } from "@/types";
+import { getStrapiMedia } from "@/components/ui/strapi-image";
 
 interface BlockRendererProps {
   content: BlocksContent;
@@ -119,11 +120,14 @@ export function BlockRenderer({ content }: BlockRendererProps) {
               </pre>
             );
 
-          case "image":
+          case "image": {
+            const imageUrl = getStrapiMedia(block.image.url);
+            if (!imageUrl) return null;
+
             return (
               <figure key={index} className="my-4">
                 <Image
-                  src={block.image.url}
+                  src={imageUrl}
                   alt={block.image.alternativeText || ""}
                   width={block.image.width}
                   height={block.image.height}
@@ -136,6 +140,7 @@ export function BlockRenderer({ content }: BlockRendererProps) {
                 )}
               </figure>
             );
+          }
 
           default:
             return null;
