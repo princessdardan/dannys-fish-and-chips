@@ -90,6 +90,7 @@ jobs:
         run: npm run develop &
         env:
           NODE_ENV: development
+          CI: true
           HOST: 0.0.0.0
           PORT: 1337
           APP_KEYS: test-key-1,test-key-2,test-key-3,test-key-4
