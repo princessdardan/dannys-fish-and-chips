@@ -21,10 +21,6 @@ playwright/.cache/
 *.env
 !.env.example
 
-# Docker
-.docker/
-*.dockerfile.dev
-
 # Database
 *.sqlite
 *.sqlite3
