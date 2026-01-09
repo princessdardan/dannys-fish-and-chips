@@ -30,9 +30,10 @@ export default ({ env }) => ({
             secretAccessKey: env('S3_SECRET_ACCESS_KEY'),
           },
           forcePathStyle: env.bool('S3_FORCE_PATH_STYLE', true),
-          params: {
-            Bucket: env('S3_BUCKET'),
-          },
+        },
+        params: {
+          Bucket: env('S3_BUCKET'),
+          ACL: 'public-read',
         },
       },
     },
