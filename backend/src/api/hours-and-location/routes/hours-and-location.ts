@@ -4,4 +4,13 @@
 
 import { factories } from '@strapi/strapi';
 
-export default factories.createCoreRouter('api::hours-and-location.hours-and-location');
+export default factories.createCoreRouter('api::hours-and-location.hours-and-location', {
+  config: {
+    find: {
+      auth: process.env.CI === 'true' ? false : undefined,
+    },
+    findOne: {
+      auth: process.env.CI === 'true' ? false : undefined,
+    },
+  },
+});
