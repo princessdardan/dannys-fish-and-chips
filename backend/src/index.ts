@@ -114,5 +114,33 @@ export default {
         console.error('Failed to configure public permissions:', error);
       }
     }
+
+    // Fix S3 URLs for Supabase compatibility using lifecycle hooks
+    // The @strapi/provider-upload-aws-s3 plugin has a bug where baseUrl is only used
+    // when upload.Location has a protocol. Supabase returns paths without protocol,
+    // causing malformed URLs like "https://media/file.mp4"
+    strapi.db.lifecycles.subscribe({
+      models: ['plugin::upload.file'],
+      async beforeCreate(event: any) {
+        const { data } = event.params;
+
+        // Fix URLs that match the pattern: https://<bucket-name>/<filename>
+        if (data.url && data.url.match(/^https?:\/\/[^\/]+\/[^\/]+$/)) {
+          const baseUrl = process.env.S3_BASE_URL;
+          const bucket = process.env.S3_BUCKET;
+
+          // Extract the filename from the malformed URL
+          const match = data.url.match(/^https?:\/\/[^\/]+\/(.+)$/);
+          if (match && baseUrl && bucket) {
+            const filename = match[1];
+            // Reconstruct the proper URL
+            const fixedUrl = `${baseUrl}/${filename}`;
+            console.log(`[Upload Fix] Malformed URL detected: ${data.url}`);
+            console.log(`[Upload Fix] Fixed to: ${fixedUrl}`);
+            data.url = fixedUrl;
+          }
+        }
+      },
+    });
   },
 };
