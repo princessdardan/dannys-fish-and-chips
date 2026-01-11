@@ -48,21 +48,6 @@ jobs:
     name: Frontend CI
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: strapi
-          POSTGRES_PASSWORD: strapi
-          POSTGRES_DB: strapi
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     defaults:
       run:
         working-directory: ./frontend
@@ -80,76 +65,6 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm ci
-
-      - name: Install backend dependencies
-        working-directory: ./backend
-        run: npm ci
-
-      - name: Initialize PostgreSQL database
-        run: |
-          PGPASSWORD=strapi psql -h localhost -U strapi -d strapi -c "SELECT 1;" || exit 1
-          echo "PostgreSQL is accessible and ready"
-
-      - name: Start Strapi backend
-        working-directory: ./backend
-        run: |
-          npm run develop > strapi.log 2>&1 &
-          STRAPI_PID=$!
-          echo "Strapi started with PID $STRAPI_PID"
-          echo $STRAPI_PID > strapi.pid
-        env:
-          NODE_ENV: development
-          CI: true
-          HOST: 0.0.0.0
-          PORT: 1337
-          APP_KEYS: test-key-1,test-key-2,test-key-3,test-key-4
-          API_TOKEN_SALT: test-token-salt
-          ADMIN_JWT_SECRET: test-admin-secret
-          TRANSFER_TOKEN_SALT: test-transfer-salt
-          JWT_SECRET: test-jwt-secret
-          DATABASE_CLIENT: postgres
-          DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
-          DATABASE_NAME: strapi
-          DATABASE_USERNAME: strapi
-          DATABASE_PASSWORD: strapi
-          DATABASE_SSL: false
-          DATABASE_SCHEMA: public
-
-      - name: Wait for Strapi to be ready
-        working-directory: ./backend
-        run: |
-          echo "Waiting for Strapi to start..."
-          for i in {1..90}; do
-            if curl -f http://localhost:1337/_health > /dev/null 2>&1; then
-              echo "Strapi is ready!"
-              exit 0
-            fi
-            echo "Attempt $i: Strapi not ready yet..."
-
-            # Show last 10 lines of log every 10 attempts
-            if [ $((i % 10)) -eq 0 ]; then
-              echo "--- Last 10 lines of Strapi log ---"
-              tail -n 10 strapi.log 2>/dev/null || echo "No log file yet"
-            fi
-
-            # Check if Strapi process is still running
-            if [ -f strapi.pid ]; then
-              STRAPI_PID=$(cat strapi.pid)
-              if ! ps -p $STRAPI_PID > /dev/null 2>&1; then
-                echo "ERROR: Strapi process died!"
-                echo "--- Full Strapi log ---"
-                cat strapi.log 2>/dev/null || echo "No log file found"
-                exit 1
-              fi
-            fi
-
-            sleep 3
-          done
-          echo "Strapi failed to start within 270 seconds"
-          echo "--- Full Strapi log ---"
-          cat strapi.log 2>/dev/null || echo "No log file found"
-          exit 1
 
       - name: Run linter
         run: npm run lint
