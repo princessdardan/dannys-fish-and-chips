@@ -42,7 +42,7 @@ export default function Error({
         </h2>
 
         <p className="text-gray-600 mb-6">
-          We're having trouble loading this page. This might be due to a temporary connection issue.
+          We&apos;re having trouble loading this page. This might be due to a temporary connection issue.
         </p>
 
         {process.env.NODE_ENV === 'development' && (
