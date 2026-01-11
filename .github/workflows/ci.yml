@@ -167,10 +167,30 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Start Next.js production server
+        run: |
+          npm run start > nextjs.log 2>&1 &
+          NEXTJS_PID=$!
+          echo "Next.js started with PID $NEXTJS_PID"
+          echo $NEXTJS_PID > nextjs.pid
+
+      - name: Wait for Next.js to be ready
+        run: |
+          echo "Waiting for Next.js production server..."
+          for i in {1..30}; do
+            if curl -f http://localhost:3000 > /dev/null 2>&1; then
+              echo "Next.js is ready!"
+              exit 0
+            fi
+            echo "Attempt $i: Next.js not ready yet..."
+            sleep 2
+          done
+          echo "Next.js failed to start"
+          cat nextjs.log 2>/dev/null || echo "No log file"
+          exit 1
+
       - name: Run E2E tests
         run: npm run test:e2e
-        env:
-          NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
 
       - name: Upload Playwright Report
         if: always()
