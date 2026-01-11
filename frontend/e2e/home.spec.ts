@@ -3,24 +3,24 @@ import { test, expect } from '@playwright/test';
 test.describe('Home Page', () => {
   test('should load homepage successfully', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/Danny's Fish and Chips/i);
+    // Title uses & instead of "and": "Danny's Fish & Chips | Barrie, ON | Since 1975"
+    // Use flexible regex to handle apostrophe and ampersand variants
+    await expect(page).toHaveTitle(/Danny.?s Fish.{1,7}Chips/i);
   });
 
   test('should display hero section', async ({ page }) => {
-    await page.goto('/');
-    // Wait for the page to be fully loaded
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    // Check if main content is visible
-    const main = page.locator('main');
-    await expect(main).toBeVisible();
+    // Check if main content is visible (use .first() since layout has nested main tags)
+    const main = page.locator('main').first();
+    await expect(main).toBeVisible({ timeout: 10000 });
   });
 
   test('should have navigation menu', async ({ page }) => {
     await page.goto('/');
 
-    // Check for common navigation links
-    const nav = page.locator('nav');
+    // Check for common navigation links (use specific selector to avoid multiple matches)
+    const nav = page.locator('nav[aria-label="Main navigation"]');
     await expect(nav).toBeVisible();
   });
 
@@ -29,7 +29,7 @@ test.describe('Home Page', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
 
-    const main = page.locator('main');
+    const main = page.locator('main').first();
     await expect(main).toBeVisible();
   });
 });

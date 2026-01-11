@@ -10,19 +10,21 @@ test.describe('Menu Page', () => {
   });
 
   test('should load menu page directly', async ({ page }) => {
-    await page.goto('/menu');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/menu', { waitUntil: 'domcontentloaded' });
 
     // Verify we're on the menu page
     await expect(page).toHaveURL(/.*menu/);
+
+    // Wait for content to be visible
+    const main = page.locator('main').first();
+    await expect(main).toBeVisible({ timeout: 10000 });
   });
 
   test('should display menu items', async ({ page }) => {
-    await page.goto('/menu');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/menu', { waitUntil: 'domcontentloaded' });
 
-    // Check that main content is visible
-    const main = page.locator('main');
-    await expect(main).toBeVisible();
+    // Check that main content is visible (use .first() since layout has nested main tags)
+    const main = page.locator('main').first();
+    await expect(main).toBeVisible({ timeout: 10000 });
   });
 });

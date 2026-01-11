@@ -1,4 +1,5 @@
 import type { TStrapiResponse } from "@/types";
+import { getApiTimeout } from "@/lib/config";
 
 type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -23,7 +24,7 @@ type ApiOptions<P = Record<string, unknown>> = {
 async function apiWithTimeout(
   input: RequestInfo,
   init: RequestInit = {},
-  timeoutMs = 5000 // 5 seconds default - better UX, fails faster if backend is slow
+  timeoutMs = getApiTimeout() // Environment-based timeout
 ): Promise<Response> {
   // Create controller to manage request cancellation
   const controller = new AbortController();
@@ -48,7 +49,7 @@ export async function apiRequest<T = unknown, P = Record<string, unknown>>(
   url: string,
   options: ApiOptions<P>
 ): Promise<TStrapiResponse<T>> {
-  const { method, payload, timeoutMs = 5000, authToken } = options;
+  const { method, payload, timeoutMs = getApiTimeout(), authToken } = options;
 
   // Set up base headers for JSON communication
   const headers: Record<string, string> = {
@@ -154,7 +155,13 @@ export async function apiRequest<T = unknown, P = Record<string, unknown>>(
     }
 
     // Handle network errors, JSON parsing errors, and other unexpected issues
-    console.error(`Network or unexpected error on ${method} ${url}:`, error);
+    console.error(`[API Error] ${method} ${url}`, {
+      error: error instanceof Error ? error.message : String(error),
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
+      suggestion: 'Ensure Strapi backend is running. Check: http://localhost:1337/admin'
+    });
     return {
       error: {
         status: 500,

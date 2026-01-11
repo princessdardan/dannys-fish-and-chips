@@ -6,6 +6,7 @@ import { Header } from "@/components/custom/layout/header";
 import { Footer } from "@/components/custom/layout/footer";
 import { validateApiResponse } from "@/lib/error-handler";
 import { unstable_cache } from "next/cache";
+import type { TGlobal, TMainMenu } from "@/types";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +18,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Default fallback data when API fails
+const DEFAULT_GLOBAL_DATA: TGlobal = {
+  documentId: "fallback",
+  title: "Danny's Fish & Chips",
+  description: "Restaurant website",
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  publishedAt: new Date().toISOString(),
+  header: {
+    logoText: { id: 0, href: "/", label: "Danny's Fish & Chips", isExternal: false },
+    ctaButton: []
+  },
+  footer: {
+    logoText: { id: 0, href: "/", label: "Danny's Fish & Chips", isExternal: false },
+    text: "© Danny's Fish & Chips",
+    socialLink: []
+  }
+};
+
+const DEFAULT_MENU_DATA: TMainMenu = {
+  id: 0,
+  documentId: "fallback",
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  publishedAt: new Date().toISOString(),
+  MainMenuItems: []
+};
 
 // Cache global data for 1 hour (header, footer, social links)
 const getGlobalDataCached = unstable_cache(
@@ -53,9 +81,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const globalData = await getGlobalDataCached();
-  const mainMenuData = await getMainMenuDataCached();
-  
+  // Fetch data with fallbacks to prevent layout crashes
+  const globalData = await getGlobalDataCached().catch(err => {
+    console.error('[Layout] Failed to load global data:', err);
+    return DEFAULT_GLOBAL_DATA;
+  });
+
+  const mainMenuData = await getMainMenuDataCached().catch(err => {
+    console.error('[Layout] Failed to load menu data:', err);
+    return DEFAULT_MENU_DATA;
+  });
+
   return (
     <html lang="en">
       <body

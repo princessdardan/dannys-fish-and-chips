@@ -9,6 +9,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? 'html' : 'list',
+  globalSetup: './e2e/global-setup.ts',
 
   use: {
     baseURL,
@@ -31,9 +32,20 @@ export default defineConfig({
     },
   ],
 
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.CI ? undefined : [
+    // Start backend first
+    {
+      command: 'cd ../backend && npm run develop',
+      url: 'http://localhost:1337/_health',
+      timeout: 120 * 1000, // 2 min for backend startup
+      reuseExistingServer: !process.env.CI,
+    },
+    // Then start frontend
+    {
+      command: 'npm run dev',
+      url: 'http://localhost:3000',
+      timeout: 60 * 1000,
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
 });

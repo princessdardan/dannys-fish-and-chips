@@ -13,15 +13,15 @@ test.describe('Site Navigation', () => {
 
   for (const { name, path } of pages) {
     test(`should load ${name} page`, async ({ page }) => {
-      await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+
+      // Wait for main content to be visible instead of networkidle
+      // This is more reliable across browsers (especially WebKit)
+      const main = page.locator('main').first();
+      await expect(main).toBeVisible({ timeout: 10000 });
 
       // Verify page loaded successfully
       await expect(page).toHaveURL(new RegExp(path));
-
-      // Check that main content exists
-      const main = page.locator('main');
-      await expect(main).toBeVisible();
     });
   }
 
