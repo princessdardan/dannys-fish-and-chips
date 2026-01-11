@@ -64,6 +64,9 @@ ssl
 *.pem
 .tsbuildinfo
 .vercel
+batch-optimize-videos.sh
+create-thumbnail.sh
+optimize-video.sh
 
 # Yarn
 .yarn/*
@@ -83,3 +86,4 @@ ARCHITECTURE.md
 DEPLOYMENT.md
 RAILWAY_DEPLOYMENT.md
 RAILWAY_ENV_SETUP.md
+VIDEO-OPTIMIZATION-GUIDE.md
