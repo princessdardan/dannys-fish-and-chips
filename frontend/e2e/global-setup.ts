@@ -25,7 +25,7 @@ async function globalSetup() {
           return;
         }
       }
-    } catch (error) {
+    } catch {
       // Server not ready yet, continue waiting
     }
 
