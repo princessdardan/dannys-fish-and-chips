@@ -3,7 +3,6 @@ import { validateApiResponse } from "@/lib/error-handler";
 import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
 
 export const revalidate = 1800;
-export const dynamic = process.env.CI_BUILD ? 'force-dynamic' : 'auto';
 
 export default async function GalleryPage() {
   const galleryData = await loaders.getGalleryData();
