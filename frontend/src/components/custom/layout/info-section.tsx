@@ -23,9 +23,11 @@ export interface IInfoSectionProps {
 export function InfoWithMedia({ data }: { data: IInfoWithMedia }) {
     if (!data) return null;
     const { heading, media, info, orientation } = data;
-    const isVideo = media.mime?.startsWith("video/");
+
+    // Defensive guard: ensure media exists before accessing properties
+    const isVideo = media?.mime?.startsWith("video/") ?? false;
     const isImage = media && !isVideo;
-    const mediaAlt = (media?.alternativeText || data.heading || "Info section media");
+    const mediaAlt = media?.alternativeText || heading || "Info section media";
     
     {/* Text content component */}
     const TextContent = () => (

@@ -38,6 +38,10 @@ function MenuLink({ data}: { data: MenuLinkProps}) {
     if (!data) return null;
 
     const { title, url } = data;
+
+    // Defensive guard: ensure required properties exist
+    if (!url || !title) return null;
+
     const isActive = pathname === url;
 
     return (
@@ -93,6 +97,9 @@ function Dropdown({ data}: { data: DropdownMenuProps }) {
                             {section.links && section.links.length > 0 && (
                                 <ul className="flex flex-col gap-1">
                                     {section.links.map((link) => {
+                                        // Defensive guard: ensure link has required properties
+                                        if (!link?.url || !link?.title) return null;
+
                                         const isLinkActive = pathname === link.url;
                                         return (
                                             <li key={link.id}>

@@ -64,7 +64,11 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
           )}
           {link && link.length > 0 && (
             <div className="flex flex-col md:flex-row gap-4 mt-8">
-              {link.map((btn) => (
+              {link.map((btn) => {
+                // Defensive guards for button properties
+                if (!btn?.href || !btn?.label) return null;
+
+                return (
                   <Link key={btn.id} href={btn.href}>
                       <Button className="inline-flex border-4 border-brand-black italic items-center text-brand-black font-serif text-xl justify-center px-10 py-8 font-bold bg-[#faf5e9] hover:bg-[#f4e8d0] shadow-2xl transition-all hover:shadow-xl relative" variant="secondary">
                           <span className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-brand-red" />
@@ -74,7 +78,8 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
                           {btn.label}
                       </Button>
                   </Link>
-              ))}
+                );
+              })}
             </div>)}
         </div>
       </section>
@@ -118,7 +123,11 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
           </p>
         )}
         <div className="flex flex-col md:flex-row gap-4 mt-8">
-            {link.map((btn) => (
+            {link && link.length > 0 && link.map((btn) => {
+              // Defensive guards for button properties
+              if (!btn?.href || !btn?.label) return null;
+
+              return (
                 <Link key={btn.id} href={btn.href}>
                     <Button className="inline-flex border-4 border-brand-black italic items-center text-brand-black font-serif text-xl justify-center px-10 py-8 font-bold bg-[#faf5e9] hover:bg-[#f4e8d0] shadow-2xl transition-all hover:shadow-xl relative" variant="secondary">
                         <span className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-brand-red" />
@@ -128,7 +137,8 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
                         {btn.label}
                     </Button>
                 </Link>
-            ))}
+              );
+            })}
         </div>
       </div>
     </section>

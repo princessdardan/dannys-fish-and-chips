@@ -144,6 +144,9 @@ export function MobileNavigation({ ctaButton, menuItems = [] }: MobileNavigation
                           )}
                           <div className="flex flex-col gap-1">
                             {section.links && section.links.length > 0 && section.links.map((link) => {
+                              // Defensive guard: ensure link has required properties
+                              if (!link?.url || !link?.title) return null;
+
                               const isLinkActive = pathname === link.url;
                               return (
                                 <Link

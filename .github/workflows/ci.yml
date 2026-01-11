@@ -162,7 +162,7 @@ jobs:
       - name: Build Next.js application
         run: npm run build
         env:
-          NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
+          NEXT_PUBLIC_STRAPI_URL: ${{ secrets.PRODUCTION_STRAPI_URL }}
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium

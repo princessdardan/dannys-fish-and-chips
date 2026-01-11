@@ -32,8 +32,11 @@ function HeaderContent({ data, menuItems }: IHeaderProps) {
   if (!data) return null;
 
   const { logoText, ctaButton } = data;
-  const primaryCta = ctaButton[0]; // Use first CTA button for mobile
-  
+
+  // Defensive guard: Check if ctaButton exists and has elements
+  const primaryCta = ctaButton?.[0] || { href: "/contact-us", label: "Contact Us" };
+  const hasValidButtons = ctaButton && Array.isArray(ctaButton) && ctaButton.length > 0;
+
   return (
     <>
       <div className="w-full flex items-center justify-center overflow-hidden">
@@ -59,11 +62,17 @@ function HeaderContent({ data, menuItems }: IHeaderProps) {
         </nav>
 
         {/* Desktop CTA buttons - part of flex layout on md+ */}
-        <div className="hidden md:flex shrink-0 gap-2">
-          {ctaButton.map((button, index) => (
-            <HeaderButton key={index} href={button.href} label={button.label} />
-          ))}
-        </div>
+        {hasValidButtons && (
+          <div className="hidden md:flex shrink-0 gap-2">
+            {ctaButton.map((button, index) => {
+              // Additional safety: verify each button has required properties
+              if (!button?.href || !button?.label) return null;
+              return (
+                <HeaderButton key={index} href={button.href} label={button.label} />
+              );
+            })}
+          </div>
+        )}
       </div>
     </>
   );

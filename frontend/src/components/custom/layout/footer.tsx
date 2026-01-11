@@ -29,7 +29,10 @@ export function Footer({ data }: IFooterProps) {
         </p>
         <nav aria-label="Social media links">
           <div className="flex items-center space-x-4">
-            {socialLink.map((link) => {
+            {socialLink && Array.isArray(socialLink) && socialLink.length > 0 && socialLink.map((link) => {
+              // Defensive guard: ensure link has required properties
+              if (!link?.href || !link?.label) return null;
+
               return (
                 <Link
                   className="text-primary-button-text hover:text-hover-primary-button transition-colors"
