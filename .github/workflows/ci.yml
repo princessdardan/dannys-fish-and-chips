@@ -1,8 +1,17 @@
-frontend-ci:
-  name: Frontend CI (Build)
-  runs-on: ubuntu-latest
+name: CI
 
-  steps:
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend-ci:
+    name: Frontend CI (Build)
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
