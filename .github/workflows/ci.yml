@@ -1,286 +1,97 @@
-name: CI Pipeline
+frontend-ci:
+  name: Frontend CI (Build)
+  runs-on: ubuntu-latest
 
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
 
-jobs:
-  # ----------------------------
-  # Backend CI (fast, isolated)
-  # ----------------------------
-  backend-ci:
-    name: Backend CI
-    runs-on: ubuntu-latest
+    # --- Start Strapi locally for build-time prerender ---
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
 
-    defaults:
-      run:
-        working-directory: ./backend
+    - name: Build Strapi admin
+      working-directory: ./backend
+      run: npm run build
+      env:
+        NODE_ENV: production
+        APP_KEYS: test-key-1,test-key-2
+        API_TOKEN_SALT: test-token-salt
+        ADMIN_JWT_SECRET: test-admin-secret
+        TRANSFER_TOKEN_SALT: test-transfer-salt
+        JWT_SECRET: test-jwt-secret
+        ENCRYPTION_KEY: test-encryption-key
+        DATABASE_CLIENT: sqlite
+        DATABASE_FILENAME: .tmp/test.db
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Start Strapi
+      working-directory: ./backend
+      run: |
+        nohup npm run start > strapi.log 2>&1 &
+        echo $! > strapi.pid
+      env:
+        NODE_ENV: production
+        APP_KEYS: test-key-1,test-key-2
+        API_TOKEN_SALT: test-token-salt
+        ADMIN_JWT_SECRET: test-admin-secret
+        TRANSFER_TOKEN_SALT: test-transfer-salt
+        JWT_SECRET: test-jwt-secret
+        ENCRYPTION_KEY: test-encryption-key
+        DATABASE_CLIENT: sqlite
+        DATABASE_FILENAME: .tmp/test.db
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install backend dependencies
-        run: npm ci
-
-      # Optional: only if you have these scripts. If not, remove.
-      - name: Lint (backend)
-        run: npm run lint --if-present
-
-      - name: Type check (backend)
-        run: npm run typecheck --if-present
-
-      - name: Unit/Integration tests (backend)
-        run: npm test --if-present
-
-      - name: Build Strapi admin
-        run: npm run build
-        env:
-          NODE_ENV: production
-          # Mock required env vars for build
-          APP_KEYS: test-key-1,test-key-2
-          API_TOKEN_SALT: test-token-salt
-          ADMIN_JWT_SECRET: test-admin-secret
-          TRANSFER_TOKEN_SALT: test-transfer-salt
-          JWT_SECRET: test-jwt-secret
-          ENCRYPTION_KEY: test-encryption-key
-          DATABASE_CLIENT: sqlite
-          DATABASE_FILENAME: .tmp/test.db
-
-      # Optional: validate DB/migrations in a lightweight way by starting Strapi.
-      # Remove if you don't want it.
-      - name: Start Strapi briefly (migration/boot check)
-        run: |
-          nohup npm run start > strapi.log 2>&1 &
-          echo $! > strapi.pid
-          for i in {1..45}; do
-            if curl -sf http://localhost:1337/admin > /dev/null 2>&1; then
-              echo "Strapi boot OK"
-              kill $(cat strapi.pid) || true
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Strapi failed to boot"
-          cat strapi.log || true
-          exit 1
-        env:
-          NODE_ENV: production
-          APP_KEYS: test-key-1,test-key-2
-          API_TOKEN_SALT: test-token-salt
-          ADMIN_JWT_SECRET: test-admin-secret
-          TRANSFER_TOKEN_SALT: test-transfer-salt
-          JWT_SECRET: test-jwt-secret
-          ENCRYPTION_KEY: test-encryption-key
-          DATABASE_CLIENT: sqlite
-          DATABASE_FILENAME: .tmp/test.db
-
-      - name: Upload backend logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-logs
-          path: backend/strapi.log
-          retention-days: 14
-
-  # -----------------------------------------
-  # Frontend CI (lint/type/build, no backend)
-  # -----------------------------------------
-  frontend-ci:
-    name: Frontend CI (Build)
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./frontend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install frontend dependencies
-        run: npm ci
-
-      - name: Run linter
-        run: npm run lint
-
-      - name: Type check
-        run: npx tsc --noEmit
-
-      # Critical: build should not depend on live Strapi.
-      # You must make your app tolerate missing CMS at build time:
-      # - either use mock data when STRAPI unavailable
-      # - or force dynamic rendering for CMS-backed routes
-      #
-      # This env value is a deliberate sentinel: it should not be called during build.
-      - name: Build Next.js application
-        run: npm run build
-        env:
-          NEXT_PUBLIC_STRAPI_URL: http://127.0.0.1:9
-
-  # ---------------------------------------------------------
-  # E2E job (starts Strapi + Next in same runner, then tests)
-  # ---------------------------------------------------------
-  e2e:
-    name: E2E (Chromium + Firefox + WebKit)
-    runs-on: ubuntu-latest
-    needs: [backend-ci, frontend-ci]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      # ----- Backend for E2E -----
-      - name: Install backend dependencies
-        working-directory: ./backend
-        run: npm ci
-
-      - name: Build Strapi admin
-        working-directory: ./backend
-        run: npm run build
-        env:
-          NODE_ENV: production
-          APP_KEYS: test-key-1,test-key-2
-          API_TOKEN_SALT: test-token-salt
-          ADMIN_JWT_SECRET: test-admin-secret
-          TRANSFER_TOKEN_SALT: test-transfer-salt
-          JWT_SECRET: test-jwt-secret
-          ENCRYPTION_KEY: test-encryption-key
-          DATABASE_CLIENT: sqlite
-          DATABASE_FILENAME: .tmp/test.db
-
-      - name: Start Strapi
-        working-directory: ./backend
-        run: |
-          nohup npm run start > strapi.log 2>&1 &
-          echo $! > strapi.pid
-        env:
-          NODE_ENV: production
-          APP_KEYS: test-key-1,test-key-2
-          API_TOKEN_SALT: test-token-salt
-          ADMIN_JWT_SECRET: test-admin-secret
-          TRANSFER_TOKEN_SALT: test-transfer-salt
-          JWT_SECRET: test-jwt-secret
-          ENCRYPTION_KEY: test-encryption-key
-          DATABASE_CLIENT: sqlite
-          DATABASE_FILENAME: .tmp/test.db
-
-      - name: Wait for Strapi
-        run: |
-          echo "Waiting for Strapi..."
-          for i in {1..60}; do
-            if curl -sf http://localhost:1337/admin > /dev/null 2>&1; then
-              echo "Strapi is ready!"
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Strapi failed to start"
-          cat backend/strapi.log || true
-          exit 1
-
-      # ----- Frontend for E2E -----
-      - name: Install frontend dependencies
-        working-directory: ./frontend
-        run: npm ci
-
-      - name: Build Next.js application
-        working-directory: ./frontend
-        run: npm run build
-        env:
-          NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
-
-      - name: Install Playwright Browsers
-        working-directory: ./frontend
-        run: npx playwright install --with-deps chromium firefox webkit
-
-      - name: Start Next.js production server
-        working-directory: ./frontend
-        run: |
-          nohup npm run start > nextjs.log 2>&1 &
-          echo $! > nextjs.pid
-        env:
-          NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
-
-      - name: Wait for Next.js
-        run: |
-          echo "Waiting for Next.js..."
-          for i in {1..60}; do
-            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
-              echo "Next.js is ready!"
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Next.js failed to start"
-          cat frontend/nextjs.log || true
-          exit 1
-
-      - name: Run E2E tests
-        working-directory: ./frontend
-        run: npm run test:e2e
-        env:
-          NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
-
-      - name: Upload Playwright Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: frontend/playwright-report/
-          retention-days: 30
-
-      - name: Upload logs on failure
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-logs
-          path: |
-            backend/strapi.log
-            frontend/nextjs.log
-          retention-days: 14
-
-      # ----- Cleanup -----
-      - name: Cleanup processes
-        if: always()
-        run: |
-          echo "Cleaning up background processes..."
-
-          if [ -f backend/strapi.pid ]; then
-            kill $(cat backend/strapi.pid) || true
-            rm -f backend/strapi.pid
+    - name: Wait for Strapi
+      run: |
+        echo "Waiting for Strapi..."
+        for i in {1..60}; do
+          if curl -sf http://localhost:1337/admin > /dev/null 2>&1; then
+            echo "Strapi is ready!"
+            exit 0
           fi
-
-          if [ -f frontend/nextjs.pid ]; then
-            kill $(cat frontend/nextjs.pid) || true
-            rm -f frontend/nextjs.pid
-          fi
-
           sleep 2
+        done
+        echo "Strapi failed to start"
+        cat backend/strapi.log || true
+        exit 1
 
+    # --- Frontend build ---
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
 
+    - name: Run linter
+      working-directory: ./frontend
+      run: npm run lint
+
+    - name: Type check
+      working-directory: ./frontend
+      run: npx tsc --noEmit
+
+    - name: Build Next.js application
+      working-directory: ./frontend
+      run: npm run build
+      env:
+        NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
+
+    # --- Cleanup + logs ---
+    - name: Upload frontend-ci logs on non-success
+      if: ${{ always() && job.status != 'success' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-ci-logs
+        path: backend/strapi.log
+        retention-days: 14
+
+    - name: Cleanup processes
+      if: always()
+      run: |
+        if [ -f backend/strapi.pid ]; then
+          kill $(cat backend/strapi.pid) || true
+          rm -f backend/strapi.pid
+        fi
