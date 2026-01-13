@@ -17,7 +17,8 @@ A modern full-stack web application for Danny's Fish and Chips restaurant, built
 - [SQLite](https://www.sqlite.org/) - Development database
 
 **DevOps:**
-- [Vercel](https://vercel.com/) - Deployment platform
+- [Vercel](https://vercel.com/) - Frontend deployment
+- [Railway](https://railway.app/) - Backend deployment
 - [GitHub Actions](https://github.com/features/actions) - CI/CD pipeline
 
 ## Features
@@ -211,9 +212,19 @@ dannys-fish-and-chips/
 
 ## Deployment
 
-For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+This project uses a modern CI/CD pipeline with automated deployments:
 
-This project is designed to be deployed to Vercel for both frontend and backend, with a managed PostgreSQL database (Neon, Supabase, or Railway recommended).
+- **[Continuous Deployment Guide](./CONTINUOUS_DEPLOYMENT.md)** - Automated CD pipeline setup and usage
+- **[CD Setup Guide](./.github/CD_SETUP_GUIDE.md)** - Quick start guide for configuring CD
+- **[Deployment Guide](./DEPLOYMENT.md)** - Manual deployment to Vercel
+- **[Railway Deployment](./RAILWAY_DEPLOYMENT.md)** - Backend deployment to Railway
+
+### Quick Overview
+
+- **Frontend**: Deployed to Vercel (automatic on push to main)
+- **Backend**: Deployed to Railway (automatic on push to main)
+- **Environments**: Staging and Production
+- **Database Migrations**: Automatically run on backend deployments
 
 ## Contributing
 
