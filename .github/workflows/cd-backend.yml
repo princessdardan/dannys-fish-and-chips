@@ -78,6 +78,15 @@ jobs:
       if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.backend_changed == 'true'
       run: npm install -g @railway/cli
 
+    - name: Link Railway Project
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.backend_changed == 'true'
+      working-directory: ./backend
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        echo "Linking Railway project..."
+        railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+
     - name: Set Railway Environment
       if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.backend_changed == 'true'
       id: railway_env
@@ -119,7 +128,7 @@ jobs:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       run: |
         echo "🚀 Deploying to Railway (${{ steps.railway_env.outputs.environment }})..."
-        railway up -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }}
+        railway up --service ${{ steps.railway_env.outputs.service_name }} --environment ${{ steps.railway_env.outputs.environment }}
         echo "✅ Deployment triggered"
 
     - name: Wait for Railway Deployment

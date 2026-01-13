@@ -87,6 +87,8 @@ jobs:
     - name: Build Project Artifacts
       if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       working-directory: ./frontend
+      env:
+        NEXT_PUBLIC_STRAPI_URL: ${{ github.event.inputs.environment == 'staging' && secrets.RAILWAY_STAGING_URL || secrets.RAILWAY_PRODUCTION_URL }}
       run: vercel build ${{ github.event.inputs.environment == 'staging' && '' || '--prod' }} --token=${{ secrets.VERCEL_TOKEN }}
 
     - name: Deploy to Vercel
