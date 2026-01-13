@@ -3,13 +3,13 @@ name: CD - Frontend (Vercel)
 on:
   workflow_run:
     workflows: ["CI"]
-    types:
-      - completed
+    types: [completed]
     branches: [main]
+
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Deployment environment'
+        description: Deployment environment
         required: true
         type: choice
         options:
@@ -25,121 +25,122 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend to Vercel
     runs-on: ubuntu-latest
-    # Only run if CI succeeded (for workflow_run) or if manually triggered
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
     environment:
       name: ${{ github.event.inputs.environment || 'production' }}
       url: ${{ steps.deploy.outputs.url }}
 
     steps:
-    - name: Check if frontend files changed
-      if: github.event_name == 'workflow_run'
-      id: check_files
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const files = await github.rest.repos.getCommit({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: context.payload.workflow_run.head_sha
-          });
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
-          const frontendChanged = files.data.files.some(file =>
-            file.filename.startsWith('frontend/') ||
-            file.filename === '.github/workflows/cd-frontend.yml'
-          );
+      - name: Check if frontend files changed
+        if: github.event_name == 'workflow_run'
+        id: check_files
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commit = await github.rest.repos.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.workflow_run.head_sha
+            });
 
-          core.setOutput('frontend_changed', frontendChanged);
+            const frontendChanged = commit.data.files.some(file =>
+              file.filename.startsWith('frontend/') ||
+              file.filename === '.github/workflows/cd-frontend.yml'
+            );
 
-          if (!frontendChanged) {
-            core.notice('No frontend files changed, skipping deployment');
-          }
+            core.setOutput('frontend_changed', frontendChanged ? 'true' : 'false');
+            core.info(`Frontend changed: ${frontendChanged}`);
 
-    - name: Skip if no frontend changes
-      if: github.event_name == 'workflow_run' && steps.check_files.outputs.frontend_changed != 'true'
-      run: |
-        echo "No frontend files changed, skipping deployment"
-        exit 0
+      - name: Skip deploy (no frontend changes)
+        if: github.event_name == 'workflow_run' && steps.check_files.outputs.frontend_changed != 'true'
+        run: echo "No frontend changes detected. Skipping deployment."
 
-    - name: Checkout code
-      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.ref }}
+      - name: Setup Node.js
+        if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: "20"
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-    - name: Assert node/npm present
-      run: |
-        node -v
-        npm -v
-        which node
-        which npm
-    - name: Install Vercel CLI
-      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
-      run: npm install -g vercel@latest
+      - name: Assert node/npm present
+        if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
+        run: |
+          echo "PATH=$PATH"
+          command -v node
+          command -v npm
+          node -v
+          npm -v
 
-    - name: Pull Vercel Environment Information
-      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
-      working-directory: ./frontend
-      env:
-        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      run: |
-        if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
-          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-        else
-          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-        fi
+      - name: Install Vercel CLI
+        if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
+        run: npm i -g vercel@latest
 
-    - name: Build Project Artifacts
-      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
-      working-directory: ./frontend
-      env:
-        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        NEXT_PUBLIC_STRAPI_URL: ${{ github.event.inputs.environment == 'staging' && secrets.RAILWAY_STAGING_URL || secrets.RAILWAY_PRODUCTION_URL }}
-      run: vercel build ${{ github.event.inputs.environment == 'staging' && '' || '--prod' }} --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Pull Vercel project settings
+        if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
+        working-directory: ./frontend
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          ENV="${{ github.event.inputs.environment || 'production' }}"
+          if [ "$ENV" = "staging" ]; then
+            vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          fi
 
-    - name: Deploy to Vercel
-      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
-      id: deploy
-      working-directory: ./frontend
-      env:
-        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      run: |
-        if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
-          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
-        else
-          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-        fi
-        echo "url=$url" >> $GITHUB_OUTPUT
-        echo "🚀 Deployed to: $url"
+      - name: Deploy to Vercel (remote build)
+        if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
+        id: deploy
+        working-directory: ./frontend
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          NEXT_PUBLIC_STRAPI_URL: ${{ (github.event.inputs.environment || 'production') == 'staging' && secrets.RAILWAY_STAGING_URL || secrets.RAILWAY_PRODUCTION_URL }}
+        run: |
+          ENV="${{ github.event.inputs.environment || 'production' }}"
 
-    - name: Comment on commit
-      if: (github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true') && github.event_name == 'workflow_run'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const url = '${{ steps.deploy.outputs.url }}';
-          const env = '${{ github.event.inputs.environment || 'production' }}';
-          github.rest.repos.createCommitComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            commit_sha: '${{ github.event.workflow_run.head_sha }}',
-            body: `✅ Frontend deployed to **${env}**\n🔗 ${url}`
-          })
+          if [ "$ENV" = "staging" ]; then
+            url=$(vercel deploy --yes \
+              --token=${{ secrets.VERCEL_TOKEN }} \
+              --build-env NEXT_PUBLIC_STRAPI_URL="$NEXT_PUBLIC_STRAPI_URL" \
+              --env NEXT_PUBLIC_STRAPI_URL="$NEXT_PUBLIC_STRAPI_URL")
+          else
+            url=$(vercel deploy --yes --prod \
+              --token=${{ secrets.VERCEL_TOKEN }} \
+              --build-env NEXT_PUBLIC_STRAPI_URL="$NEXT_PUBLIC_STRAPI_URL" \
+              --env NEXT_PUBLIC_STRAPI_URL="$NEXT_PUBLIC_STRAPI_URL")
+          fi
 
-    - name: Deployment summary
-      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
-      run: |
-        echo "### 🚀 Frontend Deployment Successful" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "- **Environment:** ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **URL:** ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Commit:** ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "Deployed to: $url"
+
+      - name: Comment on commit
+        if: (github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true') && github.event_name == 'workflow_run'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = '${{ steps.deploy.outputs.url }}';
+            const env = '${{ github.event.inputs.environment || 'production' }}';
+
+            await github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: '${{ github.event.workflow_run.head_sha }}',
+              body: `✅ Frontend deployed to **${env}**\n🔗 ${url}`
+            });
+
+      - name: Deployment summary
+        if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
+        run: |
+          echo "### Frontend Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL:** ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}" >> $GITHUB_STEP_SUMMARY

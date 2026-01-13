@@ -214,10 +214,6 @@ dannys-fish-and-chips/
 
 This project uses a modern CI/CD pipeline with automated deployments:
 
-- **[Continuous Deployment Guide](./CONTINUOUS_DEPLOYMENT.md)** - Automated CD pipeline setup and usage
-- **[CD Setup Guide](./.github/CD_SETUP_GUIDE.md)** - Quick start guide for configuring CD
-- **[Deployment Guide](./DEPLOYMENT.md)** - Manual deployment to Vercel
-- **[Railway Deployment](./RAILWAY_DEPLOYMENT.md)** - Backend deployment to Railway
 
 ### Quick Overview
 
