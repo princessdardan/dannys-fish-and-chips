@@ -21,6 +21,11 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   deploy-backend:
     name: Deploy Backend to Railway
@@ -78,15 +83,6 @@ jobs:
       if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.backend_changed == 'true'
       run: npm install -g @railway/cli
 
-    - name: Link Railway Project
-      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.backend_changed == 'true'
-      working-directory: ./backend
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      run: |
-        echo "Linking Railway project..."
-        railway link ${{ secrets.RAILWAY_PROJECT_ID }}
-
     - name: Set Railway Environment
       if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.backend_changed == 'true'
       id: railway_env
@@ -110,11 +106,11 @@ jobs:
         npm ci
 
         # Get database credentials from Railway
-        export DATABASE_URL=$(railway variables get DATABASE_URL -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }})
-        export APP_KEYS=$(railway variables get APP_KEYS -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }})
-        export API_TOKEN_SALT=$(railway variables get API_TOKEN_SALT -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }})
-        export ADMIN_JWT_SECRET=$(railway variables get ADMIN_JWT_SECRET -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }})
-        export JWT_SECRET=$(railway variables get JWT_SECRET -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }})
+        export DATABASE_URL=$(railway variables get DATABASE_URL -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }})
+        export APP_KEYS=$(railway variables get APP_KEYS -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }})
+        export API_TOKEN_SALT=$(railway variables get API_TOKEN_SALT -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }})
+        export ADMIN_JWT_SECRET=$(railway variables get ADMIN_JWT_SECRET -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }})
+        export JWT_SECRET=$(railway variables get JWT_SECRET -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }})
 
         # Build Strapi
         npm run build
@@ -128,7 +124,7 @@ jobs:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       run: |
         echo "🚀 Deploying to Railway (${{ steps.railway_env.outputs.environment }})..."
-        railway up --service ${{ steps.railway_env.outputs.service_name }} --environment ${{ steps.railway_env.outputs.environment }}
+        railway up --service ${{ steps.railway_env.outputs.service_name }} --environment ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }}
         echo "✅ Deployment triggered"
 
     - name: Wait for Railway Deployment
@@ -140,11 +136,11 @@ jobs:
         sleep 30
 
         # Get deployment status
-        deployment_id=$(railway status -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --json | jq -r '.latestDeployment.id')
+        deployment_id=$(railway status -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }} --json | jq -r '.latestDeployment.id')
 
         # Wait up to 5 minutes for deployment
         for i in {1..30}; do
-          status=$(railway status -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --json | jq -r '.latestDeployment.status')
+          status=$(railway status -s ${{ steps.railway_env.outputs.service_name }} -e ${{ steps.railway_env.outputs.environment }} --project ${{ secrets.RAILWAY_PROJECT_ID }} --json | jq -r '.latestDeployment.status')
 
           if [ "$status" = "SUCCESS" ]; then
             echo "✅ Deployment completed successfully"
