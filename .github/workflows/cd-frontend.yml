@@ -1,11 +1,11 @@
 name: CD - Frontend (Vercel)
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches: [main]
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/cd-frontend.yml'
   workflow_dispatch:
     inputs:
       environment:
@@ -20,15 +20,50 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend to Vercel
     runs-on: ubuntu-latest
+    # Only run if CI succeeded (for workflow_run) or if manually triggered
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     environment:
       name: ${{ github.event.inputs.environment || 'production' }}
       url: ${{ steps.deploy.outputs.url }}
 
     steps:
+    - name: Check if frontend files changed
+      if: github.event_name == 'workflow_run'
+      id: check_files
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const files = await github.rest.repos.getCommit({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.payload.workflow_run.head_sha
+          });
+
+          const frontendChanged = files.data.files.some(file =>
+            file.filename.startsWith('frontend/') ||
+            file.filename === '.github/workflows/cd-frontend.yml'
+          );
+
+          core.setOutput('frontend_changed', frontendChanged);
+
+          if (!frontendChanged) {
+            core.notice('No frontend files changed, skipping deployment');
+          }
+
+    - name: Skip if no frontend changes
+      if: github.event_name == 'workflow_run' && steps.check_files.outputs.frontend_changed != 'true'
+      run: |
+        echo "No frontend files changed, skipping deployment"
+        exit 0
+
     - name: Checkout code
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.ref }}
 
     - name: Setup Node.js
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       uses: actions/setup-node@v4
       with:
         node-version: "20"
@@ -36,9 +71,11 @@ jobs:
         cache-dependency-path: frontend/package-lock.json
 
     - name: Install Vercel CLI
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       run: npm install -g vercel@latest
 
     - name: Pull Vercel Environment Information
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       working-directory: ./frontend
       run: |
         if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
@@ -48,10 +85,12 @@ jobs:
         fi
 
     - name: Build Project Artifacts
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       working-directory: ./frontend
       run: vercel build ${{ github.event.inputs.environment == 'staging' && '' || '--prod' }} --token=${{ secrets.VERCEL_TOKEN }}
 
     - name: Deploy to Vercel
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       id: deploy
       working-directory: ./frontend
       run: |
@@ -64,7 +103,7 @@ jobs:
         echo "🚀 Deployed to: $url"
 
     - name: Comment on commit
-      if: github.event_name == 'push'
+      if: (github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true') && github.event_name == 'workflow_run'
       uses: actions/github-script@v7
       with:
         script: |
@@ -73,14 +112,15 @@ jobs:
           github.rest.repos.createCommitComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            commit_sha: context.sha,
+            commit_sha: '${{ github.event.workflow_run.head_sha }}',
             body: `✅ Frontend deployed to **${env}**\n🔗 ${url}`
           })
 
     - name: Deployment summary
+      if: github.event_name == 'workflow_dispatch' || steps.check_files.outputs.frontend_changed == 'true'
       run: |
         echo "### 🚀 Frontend Deployment Successful" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "- **Environment:** ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **URL:** ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit:** ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}" >> $GITHUB_STEP_SUMMARY
