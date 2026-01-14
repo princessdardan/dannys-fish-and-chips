@@ -12,13 +12,13 @@ export default [
             "'self'",
             'data:',
             'blob:',
-            'https://ddbwmyxekofmhitwyxoy.supabase.co',
+            ...(process.env.SUPABASE_URL ? [process.env.SUPABASE_URL] : []),
           ],
           'media-src': [
             "'self'",
             'data:',
             'blob:',
-            'https://ddbwmyxekofmhitwyxoy.supabase.co',
+            ...(process.env.SUPABASE_URL ? [process.env.SUPABASE_URL] : []),
           ],
           upgradeInsecureRequests: null,
         },
@@ -28,7 +28,7 @@ export default [
   {
     name: 'strapi::cors',
     config: {
-      origin: ['*'], // In production, replace with your actual frontend domain
+      origin: process.env.CORS_ORIGIN?.split(',') || ['*'],
       headers: '*',
     },
   },
