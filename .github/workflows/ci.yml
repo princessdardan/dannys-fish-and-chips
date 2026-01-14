@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: "20"
 
@@ -45,10 +45,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: "20"
 
@@ -136,3 +136,8 @@ jobs:
           kill $(cat backend/strapi.pid) || true
           rm -f backend/strapi.pid
         fi
+
+    - name: 'notify vercel'
+      uses: 'vercel/repository-dispatch/actions/status@v1'
+      with:
+        name: 'Vercel - dannys-fish-and-chips: Frontend CI'
