@@ -72,6 +72,7 @@ jobs:
         ENCRYPTION_KEY: test-encryption-key
         DATABASE_CLIENT: sqlite
         DATABASE_FILENAME: .tmp/test.db
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
     - name: Start Strapi
       working-directory: ./backend
@@ -88,6 +89,7 @@ jobs:
         ENCRYPTION_KEY: test-encryption-key
         DATABASE_CLIENT: sqlite
         DATABASE_FILENAME: .tmp/test.db
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
     - name: Wait for Strapi
       run: |
