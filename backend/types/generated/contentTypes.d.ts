@@ -531,6 +531,39 @@ export interface ApiContactUsContactUs extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiEmailSubscriberEmailSubscriber
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'email_subscribers';
+  info: {
+    displayName: 'Email Subscriber';
+    pluralName: 'email-subscribers';
+    singularName: 'email-subscriber';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::email-subscriber.email-subscriber'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    source: Schema.Attribute.String & Schema.Attribute.DefaultTo<'website'>;
+    subscribedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiFoodAndDrinkMenuFoodAndDrinkMenu
   extends Struct.SingleTypeSchema {
   collectionName: 'food_and_drink_menus';
@@ -1296,6 +1329,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::about-us.about-us': ApiAboutUsAboutUs;
       'api::contact-us.contact-us': ApiContactUsContactUs;
+      'api::email-subscriber.email-subscriber': ApiEmailSubscriberEmailSubscriber;
       'api::food-and-drink-menu.food-and-drink-menu': ApiFoodAndDrinkMenuFoodAndDrinkMenu;
       'api::gallery.gallery': ApiGalleryGallery;
       'api::global.global': ApiGlobalGlobal;

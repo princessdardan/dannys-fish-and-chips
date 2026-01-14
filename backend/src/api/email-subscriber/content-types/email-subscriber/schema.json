@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "email_subscribers",
+  "info": {
+    "singularName": "email-subscriber",
+    "pluralName": "email-subscribers",
+    "displayName": "Email Subscriber"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "subscribedAt": {
+      "type": "datetime"
+    },
+    "source": {
+      "type": "string",
+      "default": "website"
+    }
+  }
+}

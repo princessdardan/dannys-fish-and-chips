@@ -339,3 +339,27 @@ export type TStrapiResponse<T = null> = {
   };
   status: number;
 };
+
+// Email Subscriber types
+export type TEmailSubscriber = {
+  id: number;
+  documentId: string;
+  email: string;
+  subscribedAt: string;
+  source?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TEmailSubscriberPayload = {
+  data: {
+    email: string;
+    subscribedAt?: string;
+    source?: string;
+  };
+};
+
+export type TMailingListFormState = {
+  status: "idle" | "loading" | "success" | "error";
+  message: string;
+};
