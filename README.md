@@ -212,7 +212,7 @@ dannys-fish-and-chips/
 
 ## Deployment
 
-This project uses a modern CI/CD pipeline with automated deployments:
+This project uses a modern CI/CD pipeline with automated deployments
 
 
 ### Quick Overview
