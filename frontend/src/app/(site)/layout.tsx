@@ -7,6 +7,7 @@ import { Footer } from "@/components/custom/layout/footer";
 import { validateApiResponse } from "@/lib/error-handler";
 import { unstable_cache } from "next/cache";
 import type { TGlobal, TMainMenu } from "@/types";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -104,6 +105,7 @@ export default async function RootLayout({
           </main>
           <Footer data={globalData?.footer} />
         </div>
+        <Analytics />
       </body>
     </html>
   );
