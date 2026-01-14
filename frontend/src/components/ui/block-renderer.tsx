@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Check } from "lucide-react";
+import { CircleSmall } from "lucide-react";
 import { BlocksContent, InlineNode } from "@/types";
 import { getStrapiMedia } from "@/components/ui/strapi-image";
 import { getStrapiVideo } from "@/components/ui/strapi-video";
@@ -96,7 +96,7 @@ export function BlockRenderer({ content }: BlockRendererProps) {
                 {block.children.map((item, itemIndex) => (
                   <li key={itemIndex} className={block.format === "unordered" ? "flex items-start py-0.5 gap-2" : ""}>
                     {block.format === "unordered" && (
-                      <Check className="w-4 h-4 text-brand-red shrink-0 mt-0.5" />
+                      <CircleSmall className="w-4 h-4 text-black shrink-0 mt-0.5" />
                     )}
                     <span>{renderInlineNodes(item.children)}</span>
                   </li>

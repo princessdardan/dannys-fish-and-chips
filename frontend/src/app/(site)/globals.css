@@ -345,7 +345,7 @@
   }
 
   .newspaper-body p {
-    @apply mb-4 indent-6;
+    @apply mb-4 indent-6 mx-0 max-w-none px-0;
   }
 
   .newspaper-body p:first-of-type {
@@ -366,7 +366,7 @@
   }
 
   .newspaper-body li {
-    @apply mb-2;
+    @apply mb-2 text-left;
   }
 
   .drop-cap p:first-of-type::first-letter {

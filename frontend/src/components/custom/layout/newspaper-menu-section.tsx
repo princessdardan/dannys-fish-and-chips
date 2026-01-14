@@ -2,6 +2,7 @@ import { BlockRenderer } from "@/components/ui/block-renderer";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { StrapiVideo } from "@/components/ui/strapi-video";
 import { IInfoSectionProps, IInfoWithMedia } from "./info-section";
+import { MenuColumnsWrapper } from "./menu-columns-wrapper";
 
 function MenuColumn({ feature }: { feature: IInfoWithMedia }) {
   const { heading, media, info } = feature;
@@ -10,7 +11,7 @@ function MenuColumn({ feature }: { feature: IInfoWithMedia }) {
   const mediaAlt = media?.alternativeText || heading || "Menu category image";
 
   return (
-    <div className="break-inside-avoid mb-8">
+    <div className="mb-8 pt-4">
       {/* Media - Newspaper photo style */}
       {media && (
         <figure className="mb-4">
@@ -44,11 +45,11 @@ function MenuColumn({ feature }: { feature: IInfoWithMedia }) {
       )}
 
       {/* Category Header - Newspaper section style */}
-      <div className="border-b-2 border-brand-black mb-4 pb-2">
-        <h3 className="font-serif text-2xl font-bold text-brand-black uppercase tracking-wide">
+      <div className="mb-4 pb-2">
+        <h3 className="font-serif text-2xl text-center font-bold text-brand-black uppercase tracking-wide">
           {heading}
         </h3>
-        <div className="h-0.5 bg-brand-red w-16 mt-1" />
+        <div className="h-0.5 bg-brand-black w-48 mx-auto mt-1" />
       </div>
 
       {/* Menu Items - rendered from BlocksContent */}
@@ -75,7 +76,7 @@ export function NewspaperMenuSection({ data }: { data: IInfoSectionProps }) {
           {/* Decorative top border */}
           <div className="border-t-2 border-b border-brand-black mb-6 py-1">
             <div className="flex justify-between items-center text-xs font-serif text-brand-black/60 px-4">
-              <span>Established 1985</span>
+              <span>Established 1975</span>
               <span>•</span>
               <span>{new Date().toLocaleDateString('en-GB', {
                 weekday: 'long',
@@ -116,16 +117,16 @@ export function NewspaperMenuSection({ data }: { data: IInfoSectionProps }) {
           <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-brand-red" />
 
           {/* Responsive Multi-Column Layout */}
-          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 md:gap-8">
+          <MenuColumnsWrapper>
             {features?.map((feature) => (
               <MenuColumn key={feature.id} feature={feature} />
             ))}
-          </div>
+          </MenuColumnsWrapper>
 
           {/* Bottom banner */}
           <div className="border-t-2 border-brand-black mt-10 pt-5 text-center">
             <p className="font-serif text-sm italic text-brand-black/60">
-              {"Serving the finest fish & chips since 1985 - Danny's Fish & Chips"}
+              {"Serving the finest fish & chips since 1975 - Danny's Fish & Chips"}
             </p>
           </div>
         </div>

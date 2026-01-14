@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qiE '(rm -rf|git push --force|git reset --hard|git clean)'; then echo 'BLOCK: Destructive command requires explicit user approval' >&2; exit 1; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_FILE_PATH\" | grep -qiE '(\\.env|\\.env\\.local|\\.pem$|\\.key$|secrets\\.json|credentials\\.json)'; then echo 'BLOCK: Cannot modify secrets/env files' >&2; exit 1; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
