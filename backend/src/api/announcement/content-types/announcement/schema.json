@@ -1,0 +1,57 @@
+{
+  "kind": "singleType",
+  "collectionName": "announcements",
+  "info": {
+    "singularName": "announcement",
+    "pluralName": "announcements",
+    "displayName": "Announcement",
+    "description": "Site-wide announcement banner with time-bound display."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "message": {
+      "type": "text",
+      "required": true,
+      "description": "The announcement message to display."
+    },
+    "linkText": {
+      "type": "string",
+      "description": "Optional call-to-action link text."
+    },
+    "linkUrl": {
+      "type": "string",
+      "description": "Optional URL for the call-to-action link."
+    },
+    "backgroundColor": {
+      "type": "string",
+      "default": "#c41e3a",
+      "description": "Background color for the banner (hex code)."
+    },
+    "textColor": {
+      "type": "string",
+      "default": "#ffffff",
+      "description": "Text color for the banner (hex code)."
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the announcement is currently active."
+    },
+    "startDate": {
+      "type": "datetime",
+      "description": "Optional start date for the announcement."
+    },
+    "endDate": {
+      "type": "datetime",
+      "description": "Optional end date for the announcement."
+    },
+    "isDismissible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether users can dismiss the announcement."
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "collectionName": "components_layout_location_sections",
+  "info": {
+    "displayName": "Location Section",
+    "description": "Restaurant location with map, address, hours, and contact info"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "default": "Find Us"
+    },
+    "subHeading": {
+      "type": "string"
+    },
+    "streetAddress": {
+      "type": "string",
+      "required": true
+    },
+    "city": {
+      "type": "string",
+      "required": true
+    },
+    "postcode": {
+      "type": "string",
+      "required": true
+    },
+    "country": {
+      "type": "string",
+      "default": "United Kingdom"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "required": true
+    },
+    "latitude": {
+      "type": "decimal",
+      "required": true
+    },
+    "longitude": {
+      "type": "decimal",
+      "required": true
+    },
+    "googleMapsUrl": {
+      "type": "string",
+      "required": false
+    },
+    "operatingHours": {
+      "type": "component",
+      "component": "components.operating-hours",
+      "repeatable": true
+    },
+    "parkingInfo": {
+      "type": "text",
+      "required": false
+    }
+  }
+}

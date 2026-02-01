@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "special_deals",
+  "info": {
+    "singularName": "special-deal",
+    "pluralName": "special-deals",
+    "displayName": "Special Deal",
+    "description": "Featured deals and combo meal packages"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "originalPrice": {
+      "type": "decimal",
+      "required": true
+    },
+    "dealPrice": {
+      "type": "decimal",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "itemsIncluded": {
+      "type": "component",
+      "component": "components.deal-item",
+      "repeatable": true
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

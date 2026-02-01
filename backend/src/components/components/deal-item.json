@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_components_deal_items",
+  "info": {
+    "displayName": "Deal Item",
+    "description": "An individual item included in a combo deal"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "quantity": {
+      "type": "string",
+      "default": "1"
+    }
+  }
+}

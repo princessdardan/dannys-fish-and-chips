@@ -4,10 +4,15 @@ import { InfoSection } from "@/components/custom/layout/info-section";
 import { NewspaperInfoSection } from "@/components/custom/layout/newspaper-info-section";
 import { NewspaperMenuSection } from "@/components/custom/layout/newspaper-menu-section";
 import { GallerySection } from "@/components/custom/layout/gallery-section";
+import { LocationSection, type ILocationSectionProps } from "@/components/custom/layout/location-section";
+import { DealsSection } from "@/components/custom/layout/deals-section";
+import { ReviewsSection } from "@/components/custom/layout/reviews-section";
 import type {
   IHeroSectionProps,
   IInfoSectionProps,
   IGallerySectionProps,
+  IDealsSectionProps,
+  IReviewsSectionProps,
   LayoutBlock,
 } from "@/types";
 
@@ -29,6 +34,9 @@ export type PageContext =
 type BlockComponentType =
   | typeof HeroSection
   | typeof GallerySection
+  | typeof LocationSection
+  | typeof DealsSection
+  | typeof ReviewsSection
   | ((
       props: { data: IInfoSectionProps },
       context: PageContext
@@ -40,6 +48,9 @@ type BlockComponentType =
 type BlockComponentMap = {
   "layout.hero-section": typeof HeroSection;
   "layout.gallery-section": typeof GallerySection;
+  "layout.location-section": typeof LocationSection;
+  "layout.deals-section": typeof DealsSection;
+  "layout.reviews-section": typeof ReviewsSection;
   "layout.info-section": (
     props: { data: IInfoSectionProps },
     context: PageContext
@@ -72,6 +83,9 @@ function getInfoSectionComponent(context: PageContext) {
 const BLOCK_COMPONENTS: BlockComponentMap = {
   "layout.hero-section": HeroSection,
   "layout.gallery-section": GallerySection,
+  "layout.location-section": LocationSection,
+  "layout.deals-section": DealsSection,
+  "layout.reviews-section": ReviewsSection,
   "layout.info-section": (props, context) => {
     const Component = getInfoSectionComponent(context);
     return <Component {...props} />;
@@ -152,6 +166,30 @@ export function renderLayoutBlocks({
         const GalleryComponent = Component as typeof GallerySection;
         return (
           <GalleryComponent key={key} data={block as IGallerySectionProps} />
+        );
+      }
+
+      // Handle location-section
+      if (componentType === "layout.location-section") {
+        const LocationComponent = Component as typeof LocationSection;
+        return (
+          <LocationComponent key={key} data={block as ILocationSectionProps} />
+        );
+      }
+
+      // Handle deals-section
+      if (componentType === "layout.deals-section") {
+        const DealsComponent = Component as typeof DealsSection;
+        return (
+          <DealsComponent key={key} data={block as IDealsSectionProps} />
+        );
+      }
+
+      // Handle reviews-section
+      if (componentType === "layout.reviews-section") {
+        const ReviewsComponent = Component as typeof ReviewsSection;
+        return (
+          <ReviewsComponent key={key} data={block as IReviewsSectionProps} />
         );
       }
 

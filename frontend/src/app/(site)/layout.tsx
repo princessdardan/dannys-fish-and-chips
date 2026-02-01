@@ -4,9 +4,12 @@ import "./globals.css";
 import { loaders } from "@/data/loaders";
 import { Header } from "@/components/custom/layout/header";
 import { Footer } from "@/components/custom/layout/footer";
+import { AnnouncementBanner } from "@/components/custom/layout/announcement-banner";
+import { JsonLd } from "@/components/seo/json-ld";
+import { generateRestaurantSchema } from "@/lib/structured-data";
 import { validateApiResponse } from "@/lib/error-handler";
 import { unstable_cache } from "next/cache";
-import type { TGlobal, TMainMenu } from "@/types";
+import type { TGlobal, TMainMenu, TAnnouncement, THoursAndLocation, ILocationSectionProps } from "@/types";
 import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
@@ -67,6 +70,40 @@ const getMainMenuDataCached = unstable_cache(
   { revalidate: 300, tags: ['menu'] }
 );
 
+// Cache announcement data for 5 minutes (allows quick updates)
+const getAnnouncementDataCached = unstable_cache(
+  async (): Promise<TAnnouncement | null> => {
+    return loaders.getAnnouncementData();
+  },
+  ['announcement-data'],
+  { revalidate: 300, tags: ['announcement'] }
+);
+
+// Cache hours and location data for JSON-LD schema (1 hour)
+const getHoursAndLocationDataCached = unstable_cache(
+  async (): Promise<THoursAndLocation | null> => {
+    const response = await loaders.getHoursAndLocationData();
+    if (!response.success || !response.data) return null;
+    return response.data;
+  },
+  ['hours-location-data'],
+  { revalidate: 3600, tags: ['hours-location'] }
+);
+
+/**
+ * Extracts location section from hours and location page blocks.
+ */
+function extractLocationData(data: THoursAndLocation | null): ILocationSectionProps | null {
+  if (!data?.blocks) return null;
+  const locationBlock = data.blocks.find(
+    (block): block is ILocationSectionProps => block.__component === "layout.location-section"
+  );
+  return locationBlock || null;
+}
+
+// Site URL for structured data
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dannysfishandchips.com";
+
 /**
  * Build site-wide metadata from Strapi with safe fallbacks.
  *
@@ -106,12 +143,30 @@ export default async function RootLayout({
     return DEFAULT_MENU_DATA;
   });
 
+  const announcementData = await getAnnouncementDataCached().catch(err => {
+    console.error('[Layout] Failed to load announcement data:', err);
+    return null;
+  });
+
+  const hoursLocationData = await getHoursAndLocationDataCached().catch(err => {
+    console.error('[Layout] Failed to load hours/location data:', err);
+    return null;
+  });
+
+  // Generate restaurant schema for JSON-LD
+  const locationData = extractLocationData(hoursLocationData);
+  const restaurantSchema = generateRestaurantSchema(locationData, SITE_URL);
+
   return (
     <html lang="en">
+      <head>
+        <JsonLd data={restaurantSchema} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="flex flex-col min-h-screen">
+          <AnnouncementBanner data={announcementData} />
           <Header data={globalData?.header} menuItems={mainMenuData?.MainMenuItems} />
           <main className="grow">
             {children}

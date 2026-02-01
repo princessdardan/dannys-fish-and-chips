@@ -1,0 +1,36 @@
+{
+  "collectionName": "components_layout_reviews_sections",
+  "info": {
+    "displayName": "Reviews Section",
+    "icon": "star",
+    "description": "Section for embedding third-party review widgets."
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "default": "What Our Customers Say"
+    },
+    "subHeading": {
+      "type": "string"
+    },
+    "widgetType": {
+      "type": "enumeration",
+      "enum": ["google", "tripadvisor", "elfsight", "custom"],
+      "default": "elfsight"
+    },
+    "widgetEmbedCode": {
+      "type": "text",
+      "description": "HTML embed code for the reviews widget (Elfsight or custom)."
+    },
+    "googlePlaceId": {
+      "type": "string",
+      "description": "Google Place ID for Google Reviews widget."
+    },
+    "tripAdvisorUrl": {
+      "type": "string",
+      "description": "TripAdvisor business URL for widget."
+    }
+  },
+  "config": {}
+}

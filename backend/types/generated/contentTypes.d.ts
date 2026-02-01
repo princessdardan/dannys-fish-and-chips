@@ -500,6 +500,44 @@ export interface ApiAboutUsAboutUs extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiAnnouncementAnnouncement extends Struct.SingleTypeSchema {
+  collectionName: 'announcements';
+  info: {
+    description: 'Site-wide announcement banner with time-bound display.';
+    displayName: 'Announcement';
+    pluralName: 'announcements';
+    singularName: 'announcement';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    backgroundColor: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'#c41e3a'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    endDate: Schema.Attribute.DateTime;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    isDismissible: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    linkText: Schema.Attribute.String;
+    linkUrl: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::announcement.announcement'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    startDate: Schema.Attribute.DateTime;
+    textColor: Schema.Attribute.String & Schema.Attribute.DefaultTo<'#ffffff'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiContactUsContactUs extends Struct.SingleTypeSchema {
   collectionName: 'contact_uses';
   info: {
@@ -679,7 +717,7 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   };
   attributes: {
     blocks: Schema.Attribute.DynamicZone<
-      ['layout.hero-section', 'layout.info-section']
+      ['layout.hero-section', 'layout.info-section', 'layout.reviews-section']
     >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -713,7 +751,7 @@ export interface ApiHoursAndLocationHoursAndLocation
   };
   attributes: {
     blocks: Schema.Attribute.DynamicZone<
-      ['layout.hero-section', 'layout.info-section']
+      ['layout.hero-section', 'layout.info-section', 'layout.location-section']
     >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -794,6 +832,42 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiSpecialDealSpecialDeal extends Struct.CollectionTypeSchema {
+  collectionName: 'special_deals';
+  info: {
+    description: 'Featured deals and combo meal packages';
+    displayName: 'Special Deal';
+    pluralName: 'special-deals';
+    singularName: 'special-deal';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dealPrice: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    image: Schema.Attribute.Media<'images'>;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    itemsIncluded: Schema.Attribute.Component<'components.deal-item', true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::special-deal.special-deal'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    originalPrice: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSpecialSpecial extends Struct.SingleTypeSchema {
   collectionName: 'specials';
   info: {
@@ -807,7 +881,7 @@ export interface ApiSpecialSpecial extends Struct.SingleTypeSchema {
   };
   attributes: {
     blocks: Schema.Attribute.DynamicZone<
-      ['layout.hero-section', 'layout.info-section']
+      ['layout.hero-section', 'layout.info-section', 'layout.deals-section']
     >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1339,6 +1413,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::about-us.about-us': ApiAboutUsAboutUs;
+      'api::announcement.announcement': ApiAnnouncementAnnouncement;
       'api::contact-us.contact-us': ApiContactUsContactUs;
       'api::email-subscriber.email-subscriber': ApiEmailSubscriberEmailSubscriber;
       'api::food-and-drink-menu.food-and-drink-menu': ApiFoodAndDrinkMenuFoodAndDrinkMenu;
@@ -1348,6 +1423,7 @@ declare module '@strapi/strapi' {
       'api::hours-and-location.hours-and-location': ApiHoursAndLocationHoursAndLocation;
       'api::main-menu.main-menu': ApiMainMenuMainMenu;
       'api::section.section': ApiSectionSection;
+      'api::special-deal.special-deal': ApiSpecialDealSpecialDeal;
       'api::special.special': ApiSpecialSpecial;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

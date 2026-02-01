@@ -99,3 +99,6 @@ supabase/.temp/storage-version
 claude-hooks.ts
 claude-policies.yml
 claude-skills.yml
+.playwright-mcp/hours-location-page.png
+.gitignore
+.playwright-mcp/announcement-banner-working.png

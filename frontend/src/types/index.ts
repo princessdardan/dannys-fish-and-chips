@@ -1,8 +1,9 @@
 import { IMainMenuItems } from "@/app/(site)/main-menu";
 import { IHeroSectionProps } from "@/components/custom/layout/hero-section";
 import { IInfoSectionProps } from "@/components/custom/layout/info-section";
+import { ILocationSectionProps, IOperatingHours } from "@/components/custom/layout/location-section";
 
-export type { IHeroSectionProps, IInfoSectionProps };
+export type { IHeroSectionProps, IInfoSectionProps, ILocationSectionProps, IOperatingHours };
 
 
 // Strapi Block Rich Text Types
@@ -289,7 +290,7 @@ export type THoursAndLocation = {
   blocks: THoursAndLocationPageBlocks[];
 };
 
-export type THoursAndLocationPageBlocks = IHeroSectionProps | IInfoSectionProps;
+export type THoursAndLocationPageBlocks = IHeroSectionProps | IInfoSectionProps | ILocationSectionProps;
 
 export type TSpecial = {
   documentId: string;
@@ -301,7 +302,35 @@ export type TSpecial = {
   blocks: TSpecialBlocks[];
 };
 
-export type TSpecialBlocks = IHeroSectionProps | IInfoSectionProps;
+export interface IDealItem {
+  id: number;
+  name: string;
+  quantity: string;
+}
+
+export type TSpecialDeal = {
+  id: number;
+  documentId: string;
+  name: string;
+  description: string;
+  originalPrice: number;
+  dealPrice: number;
+  image: TImage | null;
+  itemsIncluded: IDealItem[];
+  isActive: boolean;
+  sortOrder: number;
+};
+
+export interface IDealsSectionProps {
+  __component: "layout.deals-section";
+  id: number;
+  heading: string;
+  subHeading?: string;
+  description?: string;
+  deals?: TSpecialDeal[];
+}
+
+export type TSpecialBlocks = IHeroSectionProps | IInfoSectionProps | IDealsSectionProps;
 
 export type TSpecialPageBlocks = TSpecialBlocks;
 
@@ -318,7 +347,10 @@ export interface IGallerySectionProps {
 export type LayoutBlock =
   | IHeroSectionProps
   | IInfoSectionProps
-  | IGallerySectionProps;
+  | IGallerySectionProps
+  | ILocationSectionProps
+  | IDealsSectionProps
+  | IReviewsSectionProps;
 
 export type TStrapiResponse<T = null> = {
   success: boolean;
@@ -363,3 +395,33 @@ export type TMailingListFormState = {
   status: "idle" | "loading" | "success" | "error";
   message: string;
 };
+
+// Announcement Banner types
+export type TAnnouncement = {
+  id: number;
+  documentId: string;
+  message: string;
+  linkText?: string;
+  linkUrl?: string;
+  backgroundColor: string;
+  textColor: string;
+  isActive: boolean;
+  startDate?: string;
+  endDate?: string;
+  isDismissible: boolean;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+};
+
+// Reviews Section types
+export interface IReviewsSectionProps {
+  id: number;
+  __component: "layout.reviews-section";
+  heading: string;
+  subHeading?: string;
+  widgetType: "google" | "tripadvisor" | "elfsight" | "custom";
+  widgetEmbedCode?: string;
+  googlePlaceId?: string;
+  tripAdvisorUrl?: string;
+}

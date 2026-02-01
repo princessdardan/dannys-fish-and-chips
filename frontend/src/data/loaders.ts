@@ -10,7 +10,9 @@ import type {
   TFoodAndDrinkMenu,
   TGallery,
   THoursAndLocation,
-  TSpecial
+  TSpecial,
+  TSpecialDeal,
+  TAnnouncement
 } from "@/types";
 
 import { api } from "@/data/data-api";
@@ -19,7 +21,7 @@ import { getStrapiURL } from "@/lib/utils";
 
 const baseUrl = getStrapiURL();
 
-// Standard populate configuration for pages with hero + info sections
+// Standard populate configuration for pages with hero + info + reviews sections
 const STANDARD_BLOCKS_POPULATE = {
   blocks: {
     on: {
@@ -43,6 +45,9 @@ const STANDARD_BLOCKS_POPULATE = {
             },
           },
         },
+      },
+      "layout.reviews-section": {
+        populate: true,
       },
     },
   },
@@ -73,6 +78,74 @@ const GALLERY_BLOCKS_POPULATE = {
   },
 };
 
+// Hours and Location page populate configuration
+const HOURS_LOCATION_BLOCKS_POPULATE = {
+  blocks: {
+    on: {
+      "layout.hero-section": {
+        populate: {
+          media: {
+            populate: true,
+          },
+          link: {
+            populate: true,
+          },
+        },
+      },
+      "layout.info-section": {
+        populate: {
+          features: {
+            populate: {
+              media: {
+                populate: true,
+              },
+            },
+          },
+        },
+      },
+      "layout.location-section": {
+        populate: {
+          operatingHours: {
+            populate: true,
+          },
+        },
+      },
+    },
+  },
+};
+
+// Special page populate configuration (hero + info + deals section)
+const SPECIAL_BLOCKS_POPULATE = {
+  blocks: {
+    on: {
+      "layout.hero-section": {
+        populate: {
+          media: {
+            populate: true,
+          },
+          link: {
+            populate: true,
+          },
+        },
+      },
+      "layout.info-section": {
+        populate: {
+          features: {
+            populate: {
+              media: {
+                populate: true,
+              },
+            },
+          },
+        },
+      },
+      "layout.deals-section": {
+        populate: true,
+      },
+    },
+  },
+};
+
 /**
  * Generic page data loader
  * @param endpoint - API endpoint (e.g., "home-page", "about-us")
@@ -80,7 +153,7 @@ const GALLERY_BLOCKS_POPULATE = {
  */
 async function loadPageData<T>(
   endpoint: string,
-  populateConfig: typeof STANDARD_BLOCKS_POPULATE | typeof GALLERY_BLOCKS_POPULATE = STANDARD_BLOCKS_POPULATE
+  populateConfig: typeof STANDARD_BLOCKS_POPULATE | typeof GALLERY_BLOCKS_POPULATE | typeof HOURS_LOCATION_BLOCKS_POPULATE | typeof SPECIAL_BLOCKS_POPULATE = STANDARD_BLOCKS_POPULATE
 ): Promise<TStrapiResponse<T>> {
   const query = qs.stringify({ populate: populateConfig });
   const url = new URL(`/api/${endpoint}`, baseUrl);
@@ -163,11 +236,57 @@ async function getGalleryData(): Promise<TStrapiResponse<TGallery>> {
 }
 
 async function getHoursAndLocationData(): Promise<TStrapiResponse<THoursAndLocation>> {
-  return loadPageData<THoursAndLocation>("hours-and-location");
+  return loadPageData<THoursAndLocation>("hours-and-location", HOURS_LOCATION_BLOCKS_POPULATE);
 }
 
 async function getSpecialData(): Promise<TStrapiResponse<TSpecial>> {
-  return loadPageData<TSpecial>("special");
+  return loadPageData<TSpecial>("special", SPECIAL_BLOCKS_POPULATE);
+}
+
+async function getSpecialDealsData(): Promise<TStrapiResponse<TSpecialDeal[]>> {
+  const query = qs.stringify({
+    populate: {
+      image: {
+        populate: true,
+      },
+      itemsIncluded: {
+        populate: true,
+      },
+    },
+    filters: {
+      isActive: {
+        $eq: true,
+      },
+    },
+    sort: ["sortOrder:asc"],
+  });
+
+  const url = new URL("/api/special-deals", baseUrl);
+  url.search = query;
+  return api.get<TSpecialDeal[]>(url.href);
+}
+
+/**
+ * Fetches the active announcement banner data.
+ * Returns null if no announcement is active or outside date range.
+ */
+async function getAnnouncementData(): Promise<TAnnouncement | null> {
+  const url = new URL("/api/announcement", baseUrl);
+  const response = await api.get<TAnnouncement>(url.href);
+
+  if (!response.success || !response.data) return null;
+
+  const announcement = response.data;
+
+  // Check if announcement is active
+  if (!announcement.isActive) return null;
+
+  // Check date range
+  const now = new Date();
+  if (announcement.startDate && new Date(announcement.startDate) > now) return null;
+  if (announcement.endDate && new Date(announcement.endDate) < now) return null;
+
+  return announcement;
 }
 
 /**
@@ -187,4 +306,6 @@ export const loaders = {
   getGalleryData,
   getHoursAndLocationData,
   getSpecialData,
+  getSpecialDealsData,
+  getAnnouncementData,
 };

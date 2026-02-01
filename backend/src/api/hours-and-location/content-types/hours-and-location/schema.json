@@ -24,9 +24,10 @@
       "type": "dynamiczone",
       "components": [
         "layout.hero-section",
-        "layout.info-section"
+        "layout.info-section",
+        "layout.location-section"
       ],
-      "description": "Flexible page sections composed from hero and info blocks."
+      "description": "Flexible page sections composed from hero, info, and location blocks."
     }
   }
 }

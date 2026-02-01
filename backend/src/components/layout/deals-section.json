@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_layout_deals_sections",
+  "info": {
+    "displayName": "Deals Section",
+    "description": "A section displaying featured deals in a card grid layout"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "default": "Today's Specials"
+    },
+    "subHeading": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}
