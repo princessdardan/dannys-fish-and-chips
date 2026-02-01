@@ -155,7 +155,7 @@ function OperatingHoursCard({ hours }: { hours: IOperatingHours[] }) {
 }
 
 /**
- * Address and contact card component
+ * Address and contact card component with embedded map
  */
 function AddressCard({
   streetAddress,
@@ -165,6 +165,8 @@ function AddressCard({
   phoneNumber,
   googleMapsUrl,
   parkingInfo,
+  latitude,
+  longitude,
 }: {
   streetAddress: string;
   city: string;
@@ -173,17 +175,42 @@ function AddressCard({
   phoneNumber: string;
   googleMapsUrl?: string;
   parkingInfo?: string;
+  latitude: number;
+  longitude: number;
 }) {
   const fullAddress = `${streetAddress}, ${city}, ${postcode}, ${country}`;
-  const mapsUrl =
-    googleMapsUrl ||
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+
+  // Ensure googleMapsUrl has protocol, or use fallback
+  let mapsUrl = googleMapsUrl;
+  if (mapsUrl && !mapsUrl.startsWith('http://') && !mapsUrl.startsWith('https://')) {
+    mapsUrl = `https://${mapsUrl}`;
+  }
+  if (!mapsUrl) {
+    mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+  }
+
+  // Using Google Maps Embed API (no API key required for basic embeds)
+  const mapSrc = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2000!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM!5e0!3m2!1sen!2suk!4v1600000000000!5m2!1sen!2suk`;
 
   return (
     <div className="bg-white rounded-lg border border-brand-red p-6 shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <MapPin className="w-5 h-5 text-brand-red" />
         <h3 className="text-xl font-bold text-brand-black">Location</h3>
+      </div>
+
+      {/* Embedded Google Map */}
+      <div className="w-full h-[250px] rounded-lg overflow-hidden border border-gray-200 mb-4">
+        <iframe
+          src={mapSrc}
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title={`Map showing ${fullAddress}`}
+        />
       </div>
 
       <address className="not-italic text-gray-700 mb-4">
@@ -241,7 +268,7 @@ function MapEmbed({
   const mapSrc = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2000!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM!5e0!3m2!1sen!2suk!4v1600000000000!5m2!1sen!2suk`;
 
   return (
-    <div className="w-full h-[400px] rounded-lg overflow-hidden border border-brand-red shadow-sm">
+    <div className="w-full h-full min-h-[300px] rounded-lg overflow-hidden border border-brand-red shadow-sm">
       <iframe
         src={mapSrc}
         width="100%"
@@ -299,27 +326,27 @@ export function LocationSection({ data }: { data: ILocationSectionProps }) {
           )}
         </div>
 
-        {/* Map */}
-        <div className="mb-8">
-          <MapEmbed
-            latitude={latitude}
-            longitude={longitude}
-            title={heading || "Danny's Fish and Chips"}
-          />
-        </div>
+        {/* Hours and Location (with embedded map) - Two column layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Hours */}
+          <div>
+            <OperatingHoursCard hours={operatingHours || []} />
+          </div>
 
-        {/* Hours and Address Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <OperatingHoursCard hours={operatingHours || []} />
-          <AddressCard
-            streetAddress={streetAddress}
-            city={city}
-            postcode={postcode}
-            country={country}
-            phoneNumber={phoneNumber}
-            googleMapsUrl={googleMapsUrl}
-            parkingInfo={parkingInfo}
-          />
+          {/* Location with embedded map */}
+          <div>
+            <AddressCard
+              streetAddress={streetAddress}
+              city={city}
+              postcode={postcode}
+              country={country}
+              phoneNumber={phoneNumber}
+              googleMapsUrl={googleMapsUrl}
+              parkingInfo={parkingInfo}
+              latitude={latitude}
+              longitude={longitude}
+            />
+          </div>
         </div>
       </div>
     </section>

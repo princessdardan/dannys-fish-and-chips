@@ -42,7 +42,7 @@
       "required": true
     },
     "googleMapsUrl": {
-      "type": "string",
+      "type": "text",
       "required": false
     },
     "operatingHours": {
