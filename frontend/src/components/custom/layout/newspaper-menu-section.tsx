@@ -60,6 +60,11 @@ function MenuColumn({ feature }: { feature: IInfoWithMedia }) {
   );
 }
 
+/**
+ * Newspaper-styled menu section with multi-column layout.
+ *
+ * Layout: masthead + columns of menu categories via `MenuColumnsWrapper`.
+ */
 export function NewspaperMenuSection({ data }: { data: IInfoSectionProps }) {
   if (!data) return null;
 

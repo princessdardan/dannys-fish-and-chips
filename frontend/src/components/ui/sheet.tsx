@@ -6,22 +6,34 @@ import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Sheet root component (Radix Dialog wrapper).
+ */
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
 }
 
+/**
+ * Trigger button for opening the sheet.
+ */
 function SheetTrigger({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
   return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
 }
 
+/**
+ * Close button for the sheet.
+ */
 function SheetClose({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Close>) {
   return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
 }
 
+/**
+ * Portal wrapper for sheet content.
+ */
 function SheetPortal({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
@@ -44,6 +56,9 @@ function SheetOverlay({
   )
 }
 
+/**
+ * Sheet panel content container.
+ */
 function SheetContent({
   className,
   children,
@@ -81,6 +96,9 @@ function SheetContent({
   )
 }
 
+/**
+ * Header wrapper for sheet content.
+ */
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -91,6 +109,9 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * Footer wrapper for sheet content.
+ */
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -101,6 +122,9 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * Title text for the sheet.
+ */
 function SheetTitle({
   className,
   ...props
@@ -114,6 +138,9 @@ function SheetTitle({
   )
 }
 
+/**
+ * Descriptive text for the sheet.
+ */
 function SheetDescription({
   className,
   ...props

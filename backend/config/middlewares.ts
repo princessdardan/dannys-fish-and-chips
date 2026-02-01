@@ -1,3 +1,5 @@
+// Global middleware stack for Strapi HTTP requests.
+// CSP allows media from Supabase and CORS is configured by env.
 export default [
   'strapi::logger',
   'strapi::errors',

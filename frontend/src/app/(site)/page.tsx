@@ -5,6 +5,12 @@ import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
 // Revalidate every 30 minutes (1800 seconds)
 export const revalidate = 1800;
 
+/**
+ * Home page entry point.
+ *
+ * Data flow: loads home page blocks from Strapi and renders them via the
+ * layout block registry.
+ */
 export default async function Home() {
   const homePageData = await loaders.getHomePageData();
   const homeData = validateApiResponse(homePageData, "home page");

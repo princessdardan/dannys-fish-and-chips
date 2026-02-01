@@ -1,10 +1,18 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+/**
+ * Merge Tailwind class names with conflict resolution.
+ *
+ * Data flow: combines `clsx` output with `tailwind-merge`.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * Build an absolute Strapi URL from the public base URL.
+ */
 export function getStrapiURL(path: string = "") {
   return `${process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"}${path}`
 }
@@ -15,6 +23,12 @@ export function getStrapiURL(path: string = "") {
  * @param params - URLSearchParams or query string parameters
  * @param options - Additional fetch options
  * @returns Parsed JSON response or throws an error
+ */
+/**
+ * Fetch JSON from Strapi with basic error handling and ISR settings.
+ *
+ * Data flow: builds URL + query params, executes `fetch`, returns parsed JSON.
+ * Side effects: network I/O and console logging on failure.
  */
 export async function fetchStrapi<T>(
   path: string,

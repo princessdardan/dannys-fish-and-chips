@@ -3,6 +3,11 @@ import { StrapiImage } from "@/components/ui/strapi-image";
 import { StrapiVideo } from "@/components/ui/strapi-video";
 import { IInfoSectionProps, IInfoWithMedia } from "./info-section";
 
+/**
+ * Newspaper-styled feature article with optional media.
+ *
+ * Data flow: renders BlocksContent and media from an info feature item.
+ */
 export function NewspaperArticle({ data, index }: { data: IInfoWithMedia; index: number }) {
     if (!data) return null;
     const { heading, media, info } = data;
@@ -65,6 +70,11 @@ export function NewspaperArticle({ data, index }: { data: IInfoWithMedia; index:
     );
 }
 
+/**
+ * Newspaper-styled info section variant for editorial layouts.
+ *
+ * Layout: masthead + stacked `NewspaperArticle` entries.
+ */
 export function NewspaperInfoSection({ data }: { data: IInfoSectionProps }) {
     if (!data) return null;
 

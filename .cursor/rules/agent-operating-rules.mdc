@@ -1,0 +1,101 @@
+---
+description: Core operating rules for all Cursor agents - authority, format, discipline, contracts
+alwaysApply: true
+---
+
+# Agent Operating Rules
+
+Scope: Next.js (TypeScript) frontend, Strapi backend, Vercel + Railway.
+Goal: Keep agents aligned, predictable, and low-overhead.
+
+## 1. Authority & Scope
+
+- Each agent acts only within its domain
+- Cross-domain changes require an explicit handoff note (what changed, why, impact)
+- No agent unilaterally changes architecture, auth model, or data contracts
+
+## 2. Default Response Format
+
+Every agent response follows this structure:
+
+```
+Intent — what the agent is trying to achieve
+Assumptions — environment, constraints, inferred requirements
+Plan — ordered steps
+File-level changes — exact paths, create/modify/delete
+Risks — failure modes + mitigation
+```
+
+## 3. Change Discipline
+
+- Prefer additive changes over refactors
+- Refactors require a stated payoff (bug fix, perf win, simplification)
+- No "cleanup", "while I'm here", or stylistic rewrites
+
+## 4. Contracts Over Convenience
+
+All boundaries are explicit:
+- Frontend ↔ Strapi API
+- Server ↔ client components
+- Build ↔ runtime configuration
+
+Contracts are documented in code (types, schemas, adapters), not prose.
+No ad-hoc fetches or inline magic strings for endpoints or env vars.
+
+## 5. Type Safety (Hard Rule)
+
+- No `any`, no unchecked external data
+- External inputs (Strapi responses, webhooks, env vars) validated at boundary
+- App-internal code may assume validated types
+
+## 6. Determinism & Reversibility
+
+- Changes must be reproducible from repo + env vars alone
+- Deploy-impacting changes include: rollback note, failure symptom
+- Migrations/config changes are forward-only and safe to re-run
+
+## 7. Environment Separation
+
+- Local, preview, and production are treated as distinct
+- No agent assumes production behavior from local defaults
+- Secrets never cross environment boundaries
+
+## 8. Minimal Surface Area
+
+- Introduce the smallest abstraction that solves the problem
+- New libraries require justification: what it replaces, why native tools are insufficient
+
+## 9. Observability by Default
+
+Non-trivial logic changes include:
+- Where failures surface (logs, UI, metrics)
+- How to confirm success post-deploy
+- Silent failure is considered a bug
+
+## 10. Completion Definition
+
+A task is complete only when:
+- Acceptance criteria are explicitly satisfied
+- Side effects are listed
+- Follow-ups are named but not executed
+
+## 11. Prohibited Behaviors
+
+- Implicit architectural drift
+- Style-only edits
+- Assumptive security changes
+- Broad refactors without scope control
+- "Trust me" decisions without tradeoffs
+
+## 12. Canonical Handoff Note
+
+Use between agents or for cross-domain changes:
+
+```
+What changed:
+Why it changed:
+Files touched:
+Contract impact:
+Deployment impact:
+Risks:
+```

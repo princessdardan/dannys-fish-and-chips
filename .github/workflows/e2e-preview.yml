@@ -1,5 +1,8 @@
 name: E2E Tests on Vercel Preview
 
+# Runs Playwright against the Vercel Preview URL after successful deployment.
+# Uses the deployment target URL as the base URL for tests.
+
 on:
   deployment_status:
 
@@ -28,6 +31,7 @@ jobs:
         working-directory: ./frontend
         run: npx playwright install --with-deps
 
+      # The preview URL is provided by the deployment_status webhook payload.
       - name: Run E2E tests against Vercel preview
         working-directory: ./frontend
         run: npm run test:e2e
@@ -35,6 +39,7 @@ jobs:
           PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
           CI: true
 
+      # Persist report artifacts for CI inspection.
       - name: Upload Playwright Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -43,6 +48,7 @@ jobs:
           path: frontend/playwright-report/
           retention-days: 30
 
+      # Post a short summary comment on the PR (if one exists).
       - name: Comment test results on PR
         if: always()
         uses: actions/github-script@v7

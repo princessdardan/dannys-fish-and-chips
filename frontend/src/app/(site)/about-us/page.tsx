@@ -4,6 +4,11 @@ import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
 
 export const revalidate = 1800;
 
+/**
+ * About Us page.
+ *
+ * Data flow: loads page blocks from Strapi and renders via layout block renderer.
+ */
 export default async function AboutUsPage() {
   const aboutUsData = await loaders.getAboutUsData();
   const data = validateApiResponse(aboutUsData, "about us");

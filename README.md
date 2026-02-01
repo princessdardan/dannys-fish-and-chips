@@ -210,17 +210,42 @@ dannys-fish-and-chips/
    git push origin feature/your-feature-name
    ```
 
+## AI Subagents
+
+Shortcuts to specialized help when working with Cursor:
+- `frontend-engineer` - Next.js UI and component work
+- `backend-engineer-strapi` - Strapi schemas, controllers, permissions
+- `api-contract-types` - Typed API contracts and runtime validation
+- `qa-test-engineer` - Test plans and Playwright coverage
+- `performance-observability` - Caching, performance, monitoring guidance
+- `security-auth` - Auth, tokens, CORS, and public endpoint review
+- `devops-deploy` - Vercel/Railway deploy and environment setup
+- `content-seo-specialist` - SEO, metadata, and content workflows
+- `tech-lead` - Architecture decisions and implementation plans
+
 ## Deployment
 
-This project uses a modern CI/CD pipeline with automated deployments
+This project uses a modern CI/CD pipeline with automated deployments.
 
 
 ### Quick Overview
 
 - **Frontend**: Deployed to Vercel (automatic on push to main)
 - **Backend**: Deployed to Railway (automatic on push to main)
-- **Environments**: Staging and Production
-- **Database Migrations**: Automatically run on backend deployments
+- **Environments**: Vercel Preview + Production, Railway Production (optional staging via Railway environments)
+- **Database Migrations**: Strapi applies schema updates on startup
+
+### Deployment Assumptions (Infrastructure)
+
+- **Environment variables**: Managed in platform settings (Vercel/Railway), never committed.
+- **Vercel project root**: `frontend/` with `npm run build` and `npm run start` for production.
+- **Railway service root**: Repository root with `railway.json` build/start commands:
+  - Build: `cd backend && npm ci && npm run build`
+  - Start: `cd backend && npm run start`
+- **Alternate Railway root**: `backend/railway.json` supports Railway services rooted at `backend/`.
+- **Health checks**: Railway hits `/_health` on the backend service.
+- **Rollback**: Vercel/Railway dashboards allow redeploying a previous build.
+- **Preview flow**: Vercel Preview deploys on PRs; GitHub Action `e2e-preview.yml` runs Playwright against the preview URL.
 
 ## Contributing
 

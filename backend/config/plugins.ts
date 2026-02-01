@@ -1,3 +1,5 @@
+// Plugin configuration for email delivery and S3-compatible uploads.
+// Provider secrets and endpoints are managed via environment variables.
 export default ({ env }) => ({
   email: {
     config: {

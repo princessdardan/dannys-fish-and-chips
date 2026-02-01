@@ -9,8 +9,16 @@ interface HeaderWrapperProps {
 
 const HeaderContext = createContext({ isActive: false });
 
+/**
+ * Access header state (active vs. idle) for styling.
+ */
 export const useHeaderContext = () => useContext(HeaderContext);
 
+/**
+ * Wraps the header and manages scroll/hover visibility behavior.
+ *
+ * Side effects: listens to `scroll` and `load` events on `window`.
+ */
 export function HeaderWrapper({ children }: HeaderWrapperProps) {
   const pathname = usePathname();
   const isGalleryPage = pathname === "/gallery";

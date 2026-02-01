@@ -15,6 +15,9 @@ interface IStrapiMediaProps {
   draggable?: boolean;
 }
 
+/**
+ * Normalize a Strapi media URL to an absolute URL.
+ */
 export function getStrapiMedia(url: string | null) {
   const strapiURL = getStrapiURL();
   if (url == null) return null;
@@ -23,6 +26,11 @@ export function getStrapiMedia(url: string | null) {
   return `${strapiURL}${url}`;
 }
 
+/**
+ * Next.js Image wrapper that resolves Strapi media URLs.
+ *
+ * Data flow: converts the `src` to an absolute URL before rendering.
+ */
 export function StrapiImage({
   src,
   alt,

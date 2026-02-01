@@ -4,7 +4,8 @@
   "info": {
     "singularName": "food-and-drink-menu",
     "pluralName": "food-and-drink-menus",
-    "displayName": "Food and Drink Menu"
+    "displayName": "Food and Drink Menu",
+    "description": "Single type for the Food and Drink menu page content."
   },
   "options": {
     "draftAndPublish": true
@@ -12,17 +13,20 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "description": "Admin-facing title for the Food and Drink menu page."
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "description": "Short summary text shown near the page header."
     },
     "blocks": {
       "type": "dynamiczone",
       "components": [
         "layout.hero-section",
         "layout.info-section"
-      ]
+      ],
+      "description": "Flexible page sections composed from hero and info blocks."
     }
   }
 }

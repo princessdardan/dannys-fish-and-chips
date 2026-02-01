@@ -35,6 +35,12 @@ interface MobileNavigationProps {
   menuItems?: IMainMenuItems[];
 }
 
+/**
+ * Mobile navigation drawer with expandable sections.
+ *
+ * Data flow: renders Strapi menu items and CTA link, tracking open state locally.
+ * Side effects: uses `Sheet` dialog state and `usePathname` for active styling.
+ */
 export function MobileNavigation({ ctaButton, menuItems = [] }: MobileNavigationProps) {
   const pathname = usePathname();
   const { isActive: isHeaderActive } = useHeaderContext();

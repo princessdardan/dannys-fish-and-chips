@@ -78,6 +78,12 @@ function HeaderContent({ data, menuItems }: IHeaderProps) {
   );
 }
 
+/**
+ * Site header with logo, navigation, and CTA buttons.
+ *
+ * Data flow: consumes global header data and main menu items from Strapi.
+ * Layout: responsive navigation (mobile sheet + desktop menu).
+ */
 export function Header({ data, menuItems }: IHeaderProps) {
   return (
     <HeaderWrapper>

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "section",
     "pluralName": "sections",
-    "displayName": "Section"
+    "displayName": "Section",
+    "description": "Collection type for reusable menu sections."
   },
   "options": {
     "draftAndPublish": true
@@ -12,12 +13,14 @@
   "pluginOptions": {},
   "attributes": {
     "heading": {
-      "type": "string"
+      "type": "string",
+      "description": "Section heading displayed in menu layouts."
     },
     "links": {
       "type": "component",
       "component": "menu.menu-link",
-      "repeatable": true
+      "repeatable": true,
+      "description": "Repeatable list of menu links for this section."
     }
   }
 }

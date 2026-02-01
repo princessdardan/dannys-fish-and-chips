@@ -1,7 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
 
+/**
+ * Base URL for Playwright tests (overridable via env).
+ */
 const baseURL = process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000';
 
+/**
+ * Playwright test configuration for local dev and CI.
+ *
+ * Side effects: optionally starts backend/frontend servers when not in CI.
+ */
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,

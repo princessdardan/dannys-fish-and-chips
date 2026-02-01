@@ -4,7 +4,8 @@
   "info": {
     "singularName": "main-menu",
     "pluralName": "main-menus",
-    "displayName": "Main Menu"
+    "displayName": "Main Menu",
+    "description": "Single type for the primary site navigation menu."
   },
   "options": {
     "draftAndPublish": true
@@ -16,7 +17,8 @@
       "components": [
         "menu.menu-link",
         "menu.dropdown"
-      ]
+      ],
+      "description": "Ordered navigation items composed of links and dropdowns."
     }
   }
 }

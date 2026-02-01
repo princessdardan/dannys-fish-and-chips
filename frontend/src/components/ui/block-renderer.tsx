@@ -58,6 +58,11 @@ const renderInlineNodes = (nodes: InlineNode[]): React.ReactNode => {
   });
 };
 
+/**
+ * Render Strapi rich text blocks into HTML.
+ *
+ * Data flow: maps BlocksContent to semantic elements and renders inline nodes.
+ */
 export function BlockRenderer({ content }: BlockRendererProps) {
   if (!content || !Array.isArray(content)) {
     return null;

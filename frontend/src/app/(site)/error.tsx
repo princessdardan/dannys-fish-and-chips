@@ -3,12 +3,13 @@
 import Link from 'next/link';
 
 /**
- * Next.js Error Boundary for (site) route
+ * Next.js Error Boundary for (site) route.
  *
  * Automatically catches errors in page components and provides
  * a user-friendly fallback UI with retry functionality.
  *
  * This prevents the entire page from crashing when API calls fail.
+ * Props: receives the thrown error and a reset callback from Next.js.
  */
 export default function Error({
   error,

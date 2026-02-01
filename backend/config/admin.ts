@@ -1,3 +1,5 @@
+// Admin auth and token secrets; all values come from environment variables.
+// Keep these in Railway/CI secrets and never in source control.
 export default ({ env }) => ({
   auth: {
     secret: env('ADMIN_JWT_SECRET'),

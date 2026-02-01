@@ -22,6 +22,13 @@ interface IMailingListSignupProps {
   className?: string;
 }
 
+/**
+ * Mailing list signup form with basic validation and Strapi submission.
+ *
+ * Data flow: collects email, posts to `/api/email-subscribers`,
+ * and renders success/error states.
+ * Side effects: network POST to Strapi and local component state updates.
+ */
 export function MailingListSignup({
   heading = "Join Our Mailing List",
   description = "Subscribe to receive updates about specials, events, and news.",

@@ -1,7 +1,11 @@
 /**
- * Lifecycle hooks for email-subscriber
+ * Lifecycle hooks for email-subscriber.
  *
- * Sends notification emails after a new subscriber is created
+ * afterCreate sends:
+ * - Admin notification with subscriber email and timestamp.
+ * - Subscriber confirmation email.
+ *
+ * Permissions note: this runs server-side on create, regardless of API auth.
  */
 
 const ADMIN_EMAIL = 'info@dannysfishandchips.ca';

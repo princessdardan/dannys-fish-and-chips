@@ -15,6 +15,9 @@ interface IStrapiVideoProps {
   height?: number;
 }
 
+/**
+ * Normalize a Strapi video URL to an absolute URL.
+ */
 export function getStrapiVideo(url: string | null) {
   const strapiURL = getStrapiURL();
   if (url == null) return null;
@@ -23,6 +26,11 @@ export function getStrapiVideo(url: string | null) {
   return `${strapiURL}${url}`;
 }
 
+/**
+ * HTML video wrapper that resolves Strapi media URLs.
+ *
+ * Data flow: converts the `src` (and optional poster) to absolute URLs.
+ */
 export function StrapiVideo({
   src,
   className,

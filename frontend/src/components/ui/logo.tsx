@@ -4,6 +4,9 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useHeaderContext } from "../custom/layout/header-wrapper";
 
+/**
+ * Inline SVG wrapper for the Danny's logo asset.
+ */
 export function DannysLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -27,6 +30,11 @@ interface ILogoProps {
   dark?: boolean;
 }
 
+/**
+ * Logo link that adapts color based on header activity.
+ *
+ * Data flow: reads `useHeaderContext` to switch between brand colors.
+ */
 export function Logo({ data }: { data: ILogoProps }) {
   const { isActive } = useHeaderContext();
   

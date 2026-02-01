@@ -4,7 +4,8 @@
   "info": {
     "singularName": "gallery",
     "pluralName": "galleries",
-    "displayName": "Gallery"
+    "displayName": "Gallery",
+    "description": "Single type for the gallery page content."
   },
   "options": {
     "draftAndPublish": true
@@ -12,17 +13,20 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "description": "Admin-facing title for the gallery page."
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "description": "Short summary text shown near the page header."
     },
     "blocks": {
       "type": "dynamiczone",
       "components": [
         "layout.gallery-section",
         "layout.hero-section"
-      ]
+      ],
+      "description": "Gallery-specific and hero content blocks for the page."
     }
   }
 }

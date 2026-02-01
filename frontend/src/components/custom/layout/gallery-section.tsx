@@ -51,6 +51,11 @@ function GalleryImage({ img, index }: { img: TImage; index: number }) {
     );
 }
 
+/**
+ * Horizontal gallery carousel section.
+ *
+ * Data flow: consumes Strapi image list and renders a draggable carousel.
+ */
 export function GallerySection({ data }: { data: IGallerySectionProps }) {
     if (!data) return null;
 

@@ -16,6 +16,11 @@ interface IFooterProps {
   data?: TFooter | null;
 }
 
+/**
+ * Site footer with mailing list signup and social links.
+ *
+ * Data flow: uses footer content from Strapi global settings.
+ */
 export function Footer({ data }: IFooterProps) {
   if (!data) return null;
   const { logoText, socialLink, text } = data;

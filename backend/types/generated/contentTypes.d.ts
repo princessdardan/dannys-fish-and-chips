@@ -470,6 +470,7 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiAboutUsAboutUs extends Struct.SingleTypeSchema {
   collectionName: 'about_uses';
   info: {
+    description: 'Single type for the About Us page content.';
     displayName: 'About Us';
     pluralName: 'about-uses';
     singularName: 'about-us';
@@ -502,6 +503,7 @@ export interface ApiAboutUsAboutUs extends Struct.SingleTypeSchema {
 export interface ApiContactUsContactUs extends Struct.SingleTypeSchema {
   collectionName: 'contact_uses';
   info: {
+    description: 'Single type for Contact Us page content.';
     displayName: 'Contact Us';
     pluralName: 'contact-uses';
     singularName: 'contact-us';
@@ -535,6 +537,7 @@ export interface ApiEmailSubscriberEmailSubscriber
   extends Struct.CollectionTypeSchema {
   collectionName: 'email_subscribers';
   info: {
+    description: 'Collection of newsletter subscriber records.';
     displayName: 'Email Subscriber';
     pluralName: 'email-subscribers';
     singularName: 'email-subscriber';
@@ -568,6 +571,7 @@ export interface ApiFoodAndDrinkMenuFoodAndDrinkMenu
   extends Struct.SingleTypeSchema {
   collectionName: 'food_and_drink_menus';
   info: {
+    description: 'Single type for the Food and Drink menu page content.';
     displayName: 'Food and Drink Menu';
     pluralName: 'food-and-drink-menus';
     singularName: 'food-and-drink-menu';
@@ -600,6 +604,7 @@ export interface ApiFoodAndDrinkMenuFoodAndDrinkMenu
 export interface ApiGalleryGallery extends Struct.SingleTypeSchema {
   collectionName: 'galleries';
   info: {
+    description: 'Single type for the gallery page content.';
     displayName: 'Gallery';
     pluralName: 'galleries';
     singularName: 'gallery';
@@ -632,6 +637,7 @@ export interface ApiGalleryGallery extends Struct.SingleTypeSchema {
 export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   collectionName: 'globals';
   info: {
+    description: 'Site-wide global settings and layout components.';
     displayName: 'Global';
     pluralName: 'globals';
     singularName: 'global';
@@ -663,6 +669,7 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
 export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   collectionName: 'home_pages';
   info: {
+    description: 'Single type for the Home page content.';
     displayName: 'Home Page';
     pluralName: 'home-pages';
     singularName: 'home-page';
@@ -696,6 +703,7 @@ export interface ApiHoursAndLocationHoursAndLocation
   extends Struct.SingleTypeSchema {
   collectionName: 'hours_and_locations';
   info: {
+    description: 'Single type for the Hours & Location page content.';
     displayName: 'Hours & Location';
     pluralName: 'hours-and-locations';
     singularName: 'hours-and-location';
@@ -728,6 +736,7 @@ export interface ApiHoursAndLocationHoursAndLocation
 export interface ApiMainMenuMainMenu extends Struct.SingleTypeSchema {
   collectionName: 'main_menus';
   info: {
+    description: 'Single type for the primary site navigation menu.';
     displayName: 'Main Menu';
     pluralName: 'main-menus';
     singularName: 'main-menu';
@@ -758,6 +767,7 @@ export interface ApiMainMenuMainMenu extends Struct.SingleTypeSchema {
 export interface ApiSectionSection extends Struct.CollectionTypeSchema {
   collectionName: 'sections';
   info: {
+    description: 'Collection type for reusable menu sections.';
     displayName: 'Section';
     pluralName: 'sections';
     singularName: 'section';
@@ -787,6 +797,7 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
 export interface ApiSpecialSpecial extends Struct.SingleTypeSchema {
   collectionName: 'specials';
   info: {
+    description: 'Single type for the Specials page content.';
     displayName: 'Special';
     pluralName: 'specials';
     singularName: 'special';

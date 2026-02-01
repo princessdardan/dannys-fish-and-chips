@@ -4,7 +4,8 @@
   "info": {
     "singularName": "global",
     "pluralName": "globals",
-    "displayName": "Global"
+    "displayName": "Global",
+    "description": "Site-wide global settings and layout components."
   },
   "options": {
     "draftAndPublish": true
@@ -12,20 +13,24 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "description": "Admin-facing title for the global settings entry."
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "description": "Short summary describing the global configuration."
     },
     "header": {
       "type": "component",
       "component": "layout.header",
-      "repeatable": false
+      "repeatable": false,
+      "description": "Header layout configuration shared across pages."
     },
     "footer": {
       "type": "component",
       "component": "layout.footer",
-      "repeatable": false
+      "repeatable": false,
+      "description": "Footer layout configuration shared across pages."
     }
   }
 }

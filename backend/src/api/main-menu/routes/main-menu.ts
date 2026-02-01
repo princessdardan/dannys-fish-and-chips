@@ -1,5 +1,12 @@
 /**
  * main-menu router
+ *
+ * API shape:
+ * - Routes: GET /api/main-menu, PUT /api/main-menu
+ * - Query params: populate, fields, filters, sort
+ * - Response: { data: { id, attributes }, meta }
+ *
+ * Permissions: public access is toggled in CI via auth: false for read endpoints.
  */
 
 import { factories } from '@strapi/strapi';

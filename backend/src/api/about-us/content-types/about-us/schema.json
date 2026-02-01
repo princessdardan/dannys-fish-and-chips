@@ -4,7 +4,8 @@
   "info": {
     "singularName": "about-us",
     "pluralName": "about-uses",
-    "displayName": "About Us"
+    "displayName": "About Us",
+    "description": "Single type for the About Us page content."
   },
   "options": {
     "draftAndPublish": true
@@ -12,17 +13,20 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "description": "Admin-facing title for the About Us page."
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "description": "Short summary text shown near the page header."
     },
     "blocks": {
       "type": "dynamiczone",
       "components": [
         "layout.hero-section",
         "layout.info-section"
-      ]
+      ],
+      "description": "Flexible page sections composed from hero and info blocks."
     }
   }
 }

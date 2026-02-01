@@ -45,6 +45,13 @@ async function apiWithTimeout(
   }
 }
 
+/**
+ * Perform a Strapi request with JSON payload handling and timeouts.
+ *
+ * Data flow: builds headers/body from options, uses `fetch`, and normalizes
+ * Strapi responses into `TStrapiResponse`.
+ * Side effects: network I/O, console logging on failures.
+ */
 export async function apiRequest<T = unknown, P = Record<string, unknown>>(
   url: string,
   options: ApiOptions<P>
@@ -184,6 +191,12 @@ export async function apiRequest<T = unknown, P = Record<string, unknown>>(
  *
  * // Authenticated request
  * const userProfile = await api.get<TUser>('/api/users/me', { authToken: 'your-token' });
+ */
+/**
+ * Typed convenience wrapper for common HTTP verbs.
+ *
+ * Data flow: delegates to `apiRequest` with the appropriate method.
+ * Side effects: network I/O and error logging (via `apiRequest`).
  */
 export const api = {
   get: <T>(

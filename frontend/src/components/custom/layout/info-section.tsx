@@ -20,6 +20,11 @@ export interface IInfoSectionProps {
     description?: string;
     features: IInfoWithMedia[];
 }
+/**
+ * Feature row combining rich text and media with orientation controls.
+ *
+ * Data flow: renders Strapi BlocksContent alongside image/video media.
+ */
 export function InfoWithMedia({ data }: { data: IInfoWithMedia }) {
     if (!data) return null;
     const { heading, media, info, orientation } = data;
@@ -112,6 +117,11 @@ export function InfoWithMedia({ data }: { data: IInfoWithMedia }) {
         </section>
     )
 }
+/**
+ * Section wrapper for multiple `InfoWithMedia` features.
+ *
+ * Layout: centered header text + stacked feature rows.
+ */
 export function InfoSection({ data }: { data: IInfoSectionProps }) {
     if (!data) return null;
     

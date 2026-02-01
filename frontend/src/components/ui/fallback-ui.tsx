@@ -4,6 +4,9 @@
  * Skeleton/loading states shown when data fails to load
  */
 
+/**
+ * Skeleton UI for full-page loading states.
+ */
 export function PageLoadingFallback() {
   return (
     <div className="animate-pulse p-8">
@@ -23,6 +26,9 @@ export function PageLoadingFallback() {
   );
 }
 
+/**
+ * Lightweight header skeleton for async header rendering.
+ */
 export function HeaderFallback() {
   return (
     <header className="h-20 bg-gray-100 border-b border-gray-200 flex items-center justify-between px-6">
@@ -36,6 +42,9 @@ export function HeaderFallback() {
   );
 }
 
+/**
+ * Lightweight footer skeleton for async footer rendering.
+ */
 export function FooterFallback() {
   return (
     <footer className="h-32 bg-gray-100 border-t border-gray-200 flex items-center justify-center">
@@ -46,6 +55,9 @@ export function FooterFallback() {
 
 /**
  * Generic content loading skeleton
+ */
+/**
+ * Generic text content skeleton for inline loading sections.
  */
 export function ContentSkeleton() {
   return (

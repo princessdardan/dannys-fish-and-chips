@@ -1,7 +1,11 @@
 import type { Core } from '@strapi/strapi';
 
 /**
- * Configure public read permissions for all content types in CI/test environments
+ * Configure public read permissions for all content types in CI/test environments.
+ *
+ * Permission notes:
+ * - Enables public role actions: find, findOne for specified APIs.
+ * - Used to unblock E2E/CI without manual role setup.
  */
 async function configurePublicPermissions(strapi: Core.Strapi) {
   const contentTypes = [
@@ -81,6 +85,10 @@ export default {
    * This gives you an opportunity to extend code.
    */
   register({ strapi }: { strapi: Core.Strapi }) {
+    // API shape:
+    // - Route: GET /_health
+    // - Response: { status: 'ok' }
+    // - Auth: public (auth disabled)
     strapi.server.routes([
       {
         method: 'GET',
@@ -115,16 +123,16 @@ export default {
       }
     }
 
-    // Fix S3 URLs for Supabase compatibility using lifecycle hooks
-    // The @strapi/provider-upload-aws-s3 plugin has a bug where baseUrl is only used
-    // when upload.Location has a protocol. Supabase returns paths without protocol,
-    // causing malformed URLs like "https://media/file.mp4"
+    // Fix S3 URLs for Supabase compatibility using lifecycle hooks.
+    // The upload file URL is corrected when the provider returns a bare path
+    // (e.g. "https://bucket/file") that should be resolved against S3_BASE_URL.
     strapi.db.lifecycles.subscribe({
       models: ['plugin::upload.file'],
       async beforeCreate(event: any) {
         const { data } = event.params;
 
         // Fix URLs that match the pattern: https://<bucket-name>/<filename>
+        // so uploads resolve to the public base URL for the media bucket.
         if (data.url && data.url.match(/^https?:\/\/[^\/]+\/[^\/]+$/)) {
           const baseUrl = process.env.S3_BASE_URL;
           const bucket = process.env.S3_BUCKET;

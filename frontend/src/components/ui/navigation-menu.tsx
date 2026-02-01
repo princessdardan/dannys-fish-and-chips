@@ -5,6 +5,9 @@ import { ChevronDownIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Root navigation menu wrapper built on Radix primitives.
+ */
 function NavigationMenu({
   className,
   children,
@@ -29,6 +32,9 @@ function NavigationMenu({
   )
 }
 
+/**
+ * Container for navigation menu items.
+ */
 function NavigationMenuList({
   className,
   ...props
@@ -45,6 +51,9 @@ function NavigationMenuList({
   )
 }
 
+/**
+ * Individual navigation menu item wrapper.
+ */
 function NavigationMenuItem({
   className,
   ...props
@@ -58,10 +67,16 @@ function NavigationMenuItem({
   )
 }
 
+/**
+ * Variant styles for the navigation menu trigger button.
+ */
 const navigationMenuTriggerStyle = cva(
   "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-md font-medium disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
 )
 
+/**
+ * Trigger button for a dropdown menu item.
+ */
 function NavigationMenuTrigger({
   className,
   children,
@@ -82,6 +97,9 @@ function NavigationMenuTrigger({
   )
 }
 
+/**
+ * Popover content panel for dropdown menus.
+ */
 function NavigationMenuContent({
   className,
   ...props
@@ -99,6 +117,9 @@ function NavigationMenuContent({
   )
 }
 
+/**
+ * Viewport wrapper for animating dropdown content.
+ */
 function NavigationMenuViewport({
   className,
   ...props
@@ -121,6 +142,9 @@ function NavigationMenuViewport({
   )
 }
 
+/**
+ * Link component used inside navigation content.
+ */
 function NavigationMenuLink({
   className,
   ...props
@@ -137,6 +161,9 @@ function NavigationMenuLink({
   )
 }
 
+/**
+ * Small indicator caret shown under active menu items.
+ */
 function NavigationMenuIndicator({
   className,
   ...props

@@ -4,6 +4,11 @@ import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
 
 export const revalidate = 1800;
 
+/**
+ * Hours and Location page.
+ *
+ * Data flow: loads Strapi blocks and renders them via the shared block renderer.
+ */
 export default async function HoursAndLocationPage() {
   const hoursAndLocationData = await loaders.getHoursAndLocationData();
   const data = validateApiResponse(hoursAndLocationData, "hours and location");

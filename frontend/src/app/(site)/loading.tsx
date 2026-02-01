@@ -29,6 +29,12 @@ const styles = {
   outlineButton: "min-w-[160px] bg-transparent",
 };
 
+/**
+ * Route-level loading UI for the site segment.
+ *
+ * Layout: centered illustration + actions styled like the 404 screen.
+ * Side effects: uses `window.history` when the Back button is clicked.
+ */
 export default function NotFound() {
   return (
     <div className={styles.container}>

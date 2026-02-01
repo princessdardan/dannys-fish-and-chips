@@ -6,6 +6,12 @@ interface MenuColumnsWrapperProps {
   children: ReactNode;
 }
 
+/**
+ * Multi-column wrapper that calculates neighbor borders for items.
+ *
+ * Side effects: reads layout via `getBoundingClientRect` and listens to
+ * `resize`/`load` to recompute borders.
+ */
 export function MenuColumnsWrapper({ children }: MenuColumnsWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [borders, setBorders] = useState<Map<number, string>>(new Map());

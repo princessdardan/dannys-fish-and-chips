@@ -170,6 +170,12 @@ async function getSpecialData(): Promise<TStrapiResponse<TSpecial>> {
   return loadPageData<TSpecial>("special");
 }
 
+/**
+ * Centralized data loaders for Strapi page/content endpoints.
+ *
+ * Data flow: each loader builds a Strapi `populate` query and calls `api.get`,
+ * returning the normalized `TStrapiResponse` used by pages/layout.
+ */
 export const loaders = {
   getHomePageData,
   getGlobalData,

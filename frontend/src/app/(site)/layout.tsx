@@ -67,6 +67,12 @@ const getMainMenuDataCached = unstable_cache(
   { revalidate: 300, tags: ['menu'] }
 );
 
+/**
+ * Build site-wide metadata from Strapi with safe fallbacks.
+ *
+ * Data flow: requests global metadata and maps it to Next.js Metadata.
+ * Side effects: network I/O via loaders.
+ */
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = await loaders.getMetaData();
 
@@ -76,6 +82,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/**
+ * Root shell for the public site pages.
+ *
+ * Layout: renders header + main + footer and includes Vercel Analytics.
+ * Data flow: loads global header/footer + menu data with cached loaders.
+ * Side effects: server fetches + console logging on fetch failures.
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{

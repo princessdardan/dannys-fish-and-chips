@@ -1,5 +1,7 @@
 import path from 'path';
 
+// Database client configuration selected by DATABASE_CLIENT.
+// Defaults to SQLite locally, with MySQL/Postgres options for production.
 export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
 

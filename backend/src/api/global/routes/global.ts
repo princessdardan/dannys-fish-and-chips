@@ -1,5 +1,12 @@
 /**
  * global router
+ *
+ * API shape:
+ * - Routes: GET /api/global, PUT /api/global
+ * - Query params: populate, fields, filters, sort
+ * - Response: { data: { id, attributes }, meta }
+ *
+ * Permissions: public access is toggled in CI via auth: false for read endpoints.
  */
 
 import { factories } from '@strapi/strapi';

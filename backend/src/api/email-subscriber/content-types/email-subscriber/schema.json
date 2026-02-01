@@ -4,7 +4,8 @@
   "info": {
     "singularName": "email-subscriber",
     "pluralName": "email-subscribers",
-    "displayName": "Email Subscriber"
+    "displayName": "Email Subscriber",
+    "description": "Collection of newsletter subscriber records."
   },
   "options": {
     "draftAndPublish": false
@@ -14,14 +15,17 @@
     "email": {
       "type": "email",
       "required": true,
-      "unique": true
+      "unique": true,
+      "description": "Subscriber email address (unique)."
     },
     "subscribedAt": {
-      "type": "datetime"
+      "type": "datetime",
+      "description": "Timestamp of when the subscriber was added."
     },
     "source": {
       "type": "string",
-      "default": "website"
+      "default": "website",
+      "description": "Source of the subscription (e.g., website, import)."
     }
   }
 }

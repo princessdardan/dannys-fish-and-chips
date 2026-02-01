@@ -1,5 +1,8 @@
 name: CI
 
+# CI builds Strapi and Next.js using test-only env vars.
+# This workflow does not deploy; it validates build, lint, and type checks.
+
 on:
   push:
     branches: [main]
@@ -24,6 +27,7 @@ jobs:
       working-directory: ./backend
       run: npm ci
 
+    # Build Strapi admin with test-only secrets and sqlite.
     - name: Build Strapi admin
       working-directory: ./backend
       run: npm run build
@@ -59,6 +63,7 @@ jobs:
       working-directory: ./backend
       run: npm ci
 
+    # Build Strapi admin with test-only secrets and sqlite.
     - name: Build Strapi admin
       working-directory: ./backend
       run: npm run build
@@ -74,6 +79,7 @@ jobs:
         DATABASE_FILENAME: .tmp/test.db
         RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
+    # Start Strapi so Next.js can fetch during build.
     - name: Start Strapi
       working-directory: ./backend
       run: |
@@ -91,6 +97,7 @@ jobs:
         DATABASE_FILENAME: .tmp/test.db
         RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
+    # Fail fast if Strapi doesn't become ready.
     - name: Wait for Strapi
       run: |
         echo "Waiting for Strapi..."
@@ -118,6 +125,7 @@ jobs:
       working-directory: ./frontend
       run: npx tsc --noEmit
 
+    # Build with Strapi URL pointing at local CI instance.
     - name: Build Next.js application
       working-directory: ./frontend
       run: npm run build
@@ -125,6 +133,7 @@ jobs:
         NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
 
     # --- Cleanup + logs ---
+    # Upload Strapi logs to help debug failed builds.
     - name: Upload frontend-ci logs on non-success
       if: ${{ always() && job.status != 'success' }}
       uses: actions/upload-artifact@v4

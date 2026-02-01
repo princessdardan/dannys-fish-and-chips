@@ -1,5 +1,12 @@
 /**
  * Email test controller
+ *
+ * API shape:
+ * - Route: POST /api/email-test
+ * - Body: { to: string }
+ * - Response: { message, recipient, timestamp } on success
+ *
+ * Permissions: controlled in Admin Roles & Permissions.
  */
 
 export default {

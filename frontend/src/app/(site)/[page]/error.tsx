@@ -3,10 +3,11 @@
 import Link from 'next/link';
 
 /**
- * Next.js Error Boundary for [page] dynamic route
+ * Next.js Error Boundary for [page] dynamic route.
  *
  * Catches errors in dynamic page components (menu, about-us, gallery, etc.)
  * and provides a user-friendly fallback UI.
+ * Props: receives the thrown error and a reset callback from Next.js.
  */
 export default function Error({
   error,

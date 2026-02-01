@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+/**
+ * Next.js configuration for the frontend app.
+ *
+ * Side effects: enables React compiler and configures remote image sources.
+ */
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,

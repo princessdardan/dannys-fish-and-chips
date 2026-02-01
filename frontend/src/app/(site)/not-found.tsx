@@ -29,6 +29,12 @@ const styles = {
   outlineButton: "min-w-[160px] bg-transparent",
 };
 
+/**
+ * 404 screen for the site segment.
+ *
+ * Layout: large status code, illustration, and navigation actions.
+ * Side effects: uses `window.history` when the Back button is clicked.
+ */
 export default function NotFound() {
   return (
     <div className={styles.container}>

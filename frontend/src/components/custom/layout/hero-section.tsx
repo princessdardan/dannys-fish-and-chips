@@ -17,6 +17,12 @@ export interface IHeroSectionProps {
   onHomepage: boolean;
 }
 
+/**
+ * Hero section with optional image/video background and CTA links.
+ *
+ * Data flow: receives Strapi media + link data and renders a layout variant
+ * based on the `onHomepage` flag.
+ */
 export function HeroSection({ data }: { data: IHeroSectionProps }) {
     if (!data) return null;
 
