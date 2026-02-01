@@ -26,7 +26,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.561.0",
     "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.0.2&token=c0298ac241aca9c732842b4271372a2e077eefdd80a749f20795817269977949",
-    "next": "16.0.10",
+    "next": "^16.1.6",
     "qs": "^6.14.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
