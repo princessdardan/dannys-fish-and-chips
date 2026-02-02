@@ -15,7 +15,7 @@ export default async function GalleryPage() {
   const data = validateApiResponse(galleryData, "gallery");
 
   return (
-    <main className="mt-16">
+    <main className="md:pt-16">
       {renderLayoutBlocks({ blocks: data.blocks, pageContext: "gallery" })}
     </main>
   );

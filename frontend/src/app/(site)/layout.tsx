@@ -168,7 +168,7 @@ export default async function RootLayout({
         <div className="flex flex-col min-h-screen">
           <AnnouncementBanner data={announcementData} />
           <Header data={globalData?.header} menuItems={mainMenuData?.MainMenuItems} />
-          <main className="grow">
+          <main className="grow pt-16 md:pt-0">
             {children}
           </main>
           <Footer data={globalData?.footer} />
