@@ -64,15 +64,15 @@ function DealCard({ deal }: { deal: TSpecialDeal }) {
         <div className="flex items-end justify-between pt-4 border-t border-gray-100">
           <div>
             <p className="text-sm text-gray-500 line-through">
-              £{originalPrice.toFixed(2)}
+              ${originalPrice.toFixed(2)}
             </p>
             <p className="text-3xl font-bold text-brand-red">
-              £{dealPrice.toFixed(2)}
+              ${dealPrice.toFixed(2)}
             </p>
           </div>
           <div className="text-right">
             <p className="text-sm text-green-700 font-semibold">
-              Save £{savings.toFixed(2)}
+              Save ${savings.toFixed(2)}
             </p>
           </div>
         </div>
