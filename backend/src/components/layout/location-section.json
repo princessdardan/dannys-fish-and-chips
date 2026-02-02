@@ -27,7 +27,7 @@
     },
     "country": {
       "type": "string",
-      "default": "United Kingdom"
+      "default": "Canada"
     },
     "phoneNumber": {
       "type": "string",

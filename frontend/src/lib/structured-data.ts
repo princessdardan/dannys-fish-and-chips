@@ -80,7 +80,7 @@ export function generateRestaurantSchema(
       streetAddress: locationData?.streetAddress || "",
       addressLocality: locationData?.city || "",
       postalCode: locationData?.postcode || "",
-      addressCountry: locationData?.country || "United Kingdom",
+      addressCountry: locationData?.country || "Canada",
     },
     menu: `${siteUrl}/menu`,
   };
