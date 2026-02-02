@@ -396,6 +396,36 @@ export type TMailingListFormState = {
   message: string;
 };
 
+// Contact Submission types
+export type TContactSubmission = {
+  id: number;
+  documentId: string;
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+  submittedAt: string;
+  source?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TContactSubmissionPayload = {
+  data: {
+    name: string;
+    email: string;
+    subject?: string;
+    message: string;
+    submittedAt?: string;
+    source?: string;
+  };
+};
+
+export type TContactFormState = {
+  status: "idle" | "loading" | "success" | "error";
+  message: string;
+};
+
 // Announcement Banner types
 export type TAnnouncement = {
   id: number;
