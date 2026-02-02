@@ -154,8 +154,8 @@ export interface LayoutLocationSection extends Struct.ComponentSchema {
     country: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Canada'>;
     googleMapsUrl: Schema.Attribute.Text;
     heading: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Find Us'>;
-    latitude: Schema.Attribute.Decimal & Schema.Attribute.Required;
-    longitude: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    latitude: Schema.Attribute.Float & Schema.Attribute.Required;
+    longitude: Schema.Attribute.Float & Schema.Attribute.Required;
     operatingHours: Schema.Attribute.Component<
       'components.operating-hours',
       true
