@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { loaders } from "@/data/loaders";
 import { Header } from "@/components/custom/layout/header";
@@ -20,6 +20,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  style: ["normal", "italic"],
 });
 
 // Default fallback data when API fails
@@ -163,12 +170,12 @@ export default async function RootLayout({
         <JsonLd data={restaurantSchema} />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
       >
         <div className="flex flex-col min-h-screen">
           <AnnouncementBanner data={announcementData} />
           <Header data={globalData?.header} menuItems={mainMenuData?.MainMenuItems} />
-          <main className="grow pt-16 md:pt-0">
+          <main className="grow pt-16 md:pt-50">
             {children}
           </main>
           <Footer data={globalData?.footer} />

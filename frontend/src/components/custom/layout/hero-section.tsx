@@ -36,7 +36,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
   // Page variant for internal pages
   if (!onHomepage) {
     return (
-      <section className="relative h-[50vh] md:h-[60vh]">
+      <section className="relative h-[60vh] md:h-[70vh]">
         {isVideo && media && (
           <StrapiVideo
             src={media.url}

@@ -28,7 +28,7 @@ function GalleryImage({ img, index }: { img: TImage; index: number }) {
             <StrapiImage
                 src={img.url}
                 alt={img.alternativeText || `Gallery image ${index + 1}`}
-                className="w-116 h-65 sm:w-160 sm:h-90 md:w-210 md:h-120 lg:w-240 lg:h-135 rounded-xl object-cover cursor-grab active:cursor-grabbing"
+                className="w-116 h-65 sm:w-xl sm:h-81 md:w-210 md:h-120 lg:w-240 lg:h-135 rounded-xl object-cover cursor-grab active:cursor-grabbing"
                 width={960}
                 height={540}
                 draggable={false}
