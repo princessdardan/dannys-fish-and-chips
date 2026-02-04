@@ -7,12 +7,14 @@ import { GallerySection } from "@/components/custom/layout/gallery-section";
 import { LocationSection, type ILocationSectionProps } from "@/components/custom/layout/location-section";
 import { DealsSection } from "@/components/custom/layout/deals-section";
 import { ReviewsSection } from "@/components/custom/layout/reviews-section";
+import { StandfirstSection } from "@/components/custom/layout/standfirst-section";
 import type {
   IHeroSectionProps,
   IInfoSectionProps,
   IGallerySectionProps,
   IDealsSectionProps,
   IReviewsSectionProps,
+  IStandfirstSectionProps,
   LayoutBlock,
 } from "@/types";
 
@@ -37,6 +39,7 @@ type BlockComponentType =
   | typeof LocationSection
   | typeof DealsSection
   | typeof ReviewsSection
+  | typeof StandfirstSection
   | ((
       props: { data: IInfoSectionProps },
       context: PageContext
@@ -51,6 +54,7 @@ type BlockComponentMap = {
   "layout.location-section": typeof LocationSection;
   "layout.deals-section": typeof DealsSection;
   "layout.reviews-section": typeof ReviewsSection;
+  "layout.standfirst-section": typeof StandfirstSection;
   "layout.info-section": (
     props: { data: IInfoSectionProps },
     context: PageContext
@@ -86,6 +90,7 @@ const BLOCK_COMPONENTS: BlockComponentMap = {
   "layout.location-section": LocationSection,
   "layout.deals-section": DealsSection,
   "layout.reviews-section": ReviewsSection,
+  "layout.standfirst-section": StandfirstSection,
   "layout.info-section": (props, context) => {
     const Component = getInfoSectionComponent(context);
     return <Component {...props} />;
@@ -190,6 +195,14 @@ export function renderLayoutBlocks({
         const ReviewsComponent = Component as typeof ReviewsSection;
         return (
           <ReviewsComponent key={key} data={block as IReviewsSectionProps} />
+        );
+      }
+
+      // Handle standfirst-section
+      if (componentType === "layout.standfirst-section") {
+        const StandfirstComponent = Component as typeof StandfirstSection;
+        return (
+          <StandfirstComponent key={key} data={block as IStandfirstSectionProps} />
         );
       }
 

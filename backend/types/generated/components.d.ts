@@ -189,6 +189,26 @@ export interface LayoutReviewsSection extends Struct.ComponentSchema {
   };
 }
 
+export interface LayoutStandfirstSection extends Struct.ComponentSchema {
+  collectionName: 'components_layout_standfirst_sections';
+  info: {
+    description: 'Newspaper-style featured teaser with image, heading, standfirst text, and CTA';
+    displayName: 'Standfirst Section';
+  };
+  attributes: {
+    heading: Schema.Attribute.String & Schema.Attribute.Required;
+    kicker: Schema.Attribute.String;
+    link: Schema.Attribute.Component<'components.link', false> &
+      Schema.Attribute.Required;
+    media: Schema.Attribute.Media<'images' | 'videos'>;
+    mediaPosition: Schema.Attribute.Enumeration<['left', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
+    standfirst: Schema.Attribute.Text & Schema.Attribute.Required;
+    variant: Schema.Attribute.Enumeration<['featured', 'compact']> &
+      Schema.Attribute.DefaultTo<'featured'>;
+  };
+}
+
 export interface MenuDropdown extends Struct.ComponentSchema {
   collectionName: 'components_menu_dropdowns';
   info: {
@@ -226,6 +246,7 @@ declare module '@strapi/strapi' {
       'layout.info-section': LayoutInfoSection;
       'layout.location-section': LayoutLocationSection;
       'layout.reviews-section': LayoutReviewsSection;
+      'layout.standfirst-section': LayoutStandfirstSection;
       'menu.dropdown': MenuDropdown;
       'menu.menu-link': MenuMenuLink;
     }

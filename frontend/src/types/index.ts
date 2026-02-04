@@ -179,7 +179,7 @@ export type THomePage = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: (IHeroSectionProps | IInfoSectionProps)[];
+  blocks: (IHeroSectionProps | IInfoSectionProps | IReviewsSectionProps | IStandfirstSectionProps)[];
 };
 
 export type THeader = {
@@ -350,7 +350,8 @@ export type LayoutBlock =
   | IGallerySectionProps
   | ILocationSectionProps
   | IDealsSectionProps
-  | IReviewsSectionProps;
+  | IReviewsSectionProps
+  | IStandfirstSectionProps;
 
 export type TStrapiResponse<T = null> = {
   success: boolean;
@@ -454,4 +455,17 @@ export interface IReviewsSectionProps {
   widgetEmbedCode?: string;
   googlePlaceId?: string;
   tripAdvisorUrl?: string;
+}
+
+// Standfirst Section types
+export interface IStandfirstSectionProps {
+  id: number;
+  __component: "layout.standfirst-section";
+  heading: string;
+  kicker?: string;
+  standfirst: string;
+  media?: TMedia;
+  link: TLink;
+  mediaPosition: "left" | "right";
+  variant: "featured" | "compact";
 }

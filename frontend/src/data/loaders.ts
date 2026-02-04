@@ -21,7 +21,7 @@ import { getStrapiURL } from "@/lib/utils";
 
 const baseUrl = getStrapiURL();
 
-// Standard populate configuration for pages with hero + info + reviews sections
+// Standard populate configuration for pages with hero + info + reviews + standfirst sections
 const STANDARD_BLOCKS_POPULATE = {
   blocks: {
     on: {
@@ -48,6 +48,16 @@ const STANDARD_BLOCKS_POPULATE = {
       },
       "layout.reviews-section": {
         populate: true,
+      },
+      "layout.standfirst-section": {
+        populate: {
+          media: {
+            populate: true,
+          },
+          link: {
+            populate: true,
+          },
+        },
       },
     },
   },

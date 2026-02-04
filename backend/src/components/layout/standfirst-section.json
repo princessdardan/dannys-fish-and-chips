@@ -1,0 +1,51 @@
+{
+  "collectionName": "components_layout_standfirst_sections",
+  "info": {
+    "displayName": "Standfirst Section",
+    "description": "Newspaper-style featured teaser with image, heading, standfirst text, and CTA"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "kicker": {
+      "type": "string"
+    },
+    "standfirst": {
+      "type": "text",
+      "required": true
+    },
+    "media": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "videos"
+      ]
+    },
+    "link": {
+      "type": "component",
+      "component": "components.link",
+      "required": true
+    },
+    "mediaPosition": {
+      "type": "enumeration",
+      "enum": [
+        "left",
+        "right"
+      ],
+      "default": "left"
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": [
+        "featured",
+        "compact"
+      ],
+      "default": "featured"
+    }
+  },
+  "config": {}
+}

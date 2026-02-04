@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, createContext, useContext } from "react";
+import { useEffect, useState, useRef, useCallback, createContext, useContext, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
 interface HeaderWrapperProps {
@@ -19,6 +19,23 @@ const SCROLL_THRESHOLD = 100; // px before hide/show behavior activates
 const SCROLL_DELTA_THRESHOLD = 5; // minimum scroll delta to trigger visibility change
 const INACTIVITY_TIMEOUT_MS = 4000; // hide after 4 seconds of inactivity
 
+// Subscribe to scroll position for initial "scrolled" state
+function subscribeToScroll(callback: () => void) {
+  window.addEventListener("scroll", callback, { passive: true });
+  return () => window.removeEventListener("scroll", callback);
+}
+const getScrolledSnapshot = () => window.scrollY > 50;
+const getScrolledServerSnapshot = () => false;
+
+// Subscribe to reduced motion preference
+function subscribeToReducedMotion(callback: () => void) {
+  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+const getReducedMotionSnapshot = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const getReducedMotionServerSnapshot = () => false;
+
 /**
  * Wraps the header and manages scroll/hover visibility behavior.
  *
@@ -30,17 +47,13 @@ const INACTIVITY_TIMEOUT_MS = 4000; // hide after 4 seconds of inactivity
  * - Respects prefers-reduced-motion accessibility setting
  */
 export function HeaderWrapper({ children }: HeaderWrapperProps) {
-  // State - always use consistent initial values for hydration safety
-  // Browser-specific values are set in useEffect after hydration
-  const [isScrolled, setIsScrolled] = useState(false);
+  // External browser state via useSyncExternalStore (hydration-safe)
+  const isScrolled = useSyncExternalStore(subscribeToScroll, getScrolledSnapshot, getScrolledServerSnapshot);
+  const prefersReducedMotion = useSyncExternalStore(subscribeToReducedMotion, getReducedMotionSnapshot, getReducedMotionServerSnapshot);
+
+  // Internal component state
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  // Sync initial scroll position after hydration
-  useEffect(() => {
-    setIsScrolled(window.scrollY > 50);
-  }, []);
 
   // Refs for scroll tracking
   const lastScrollY = useRef(0);
@@ -49,15 +62,6 @@ export function HeaderWrapper({ children }: HeaderWrapperProps) {
 
   // Derived state
   const isActive = isScrolled || isHovered;
-
-  // Sync reduced motion preference after hydration and listen for changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
 
   // Clear inactivity timer
   const clearInactivityTimer = useCallback(() => {
@@ -83,9 +87,6 @@ export function HeaderWrapper({ children }: HeaderWrapperProps) {
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
     const scrollDelta = currentScrollY - lastScrollY.current;
-
-    // Update scrolled state (for styling changes)
-    setIsScrolled(currentScrollY > 50);
 
     // Restart inactivity timer on any scroll
     startInactivityTimer();

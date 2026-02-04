@@ -25,9 +25,10 @@
       "components": [
         "layout.hero-section",
         "layout.info-section",
-        "layout.reviews-section"
+        "layout.reviews-section",
+        "layout.standfirst-section"
       ],
-      "description": "Flexible page sections composed from hero, info, and reviews blocks."
+      "description": "Flexible page sections composed from hero, info, reviews, and standfirst blocks."
     }
   }
 }
