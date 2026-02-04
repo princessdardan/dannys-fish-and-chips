@@ -200,7 +200,7 @@ function AddressCard({
       </div>
 
       {/* Embedded Google Map */}
-      <div className="w-full h-[250px] rounded-lg overflow-hidden border border-gray-200 mb-4">
+      <div className="w-full h-62.5 rounded-lg overflow-hidden border border-gray-200 mb-4">
         <iframe
           src={mapSrc}
           width="100%"
@@ -233,7 +233,7 @@ function AddressCard({
       {/* Parking info */}
       {parkingInfo && (
         <div className="flex items-start gap-2 text-gray-600 mb-4">
-          <Car className="w-4 h-4 mt-1 flex-shrink-0" />
+          <Car className="w-4 h-4 mt-1 shrink-0" />
           <p className="text-sm">{parkingInfo}</p>
         </div>
       )}
@@ -248,37 +248,6 @@ function AddressCard({
         <Navigation className="w-4 h-4" />
         Get Directions
       </a>
-    </div>
-  );
-}
-
-/**
- * Google Maps embed component
- */
-function MapEmbed({
-  latitude,
-  longitude,
-  title,
-}: {
-  latitude: number;
-  longitude: number;
-  title: string;
-}) {
-  // Using Google Maps Embed API (no API key required for basic embeds)
-  const mapSrc = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2000!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM!5e0!3m2!1sen!2suk!4v1600000000000!5m2!1sen!2suk`;
-
-  return (
-    <div className="w-full h-full min-h-[300px] rounded-lg overflow-hidden border border-brand-red shadow-sm">
-      <iframe
-        src={mapSrc}
-        width="100%"
-        height="100%"
-        style={{ border: 0 }}
-        allowFullScreen
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        title={`Map showing location of ${title}`}
-      />
     </div>
   );
 }
