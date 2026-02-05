@@ -1,7 +1,6 @@
 import { Tag, Check } from "lucide-react";
-import Image from "next/image";
 import type { IDealsSectionProps, TSpecialDeal } from "@/types";
-import { getStrapiURL } from "@/lib/utils";
+import { StrapiImage } from "@/components/ui/strapi-image";
 
 /**
  * Individual deal card component
@@ -16,8 +15,8 @@ function DealCard({ deal }: { deal: TSpecialDeal }) {
       {/* Deal Image */}
       {image && (
         <div className="relative h-48 bg-gray-100">
-          <Image
-            src={getStrapiURL(image.url)}
+          <StrapiImage
+            src={image.url}
             alt={image.alternativeText || name}
             fill
             className="object-cover"
