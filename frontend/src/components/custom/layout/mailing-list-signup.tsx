@@ -143,7 +143,7 @@ export function MailingListSignup({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <label htmlFor="mailing-list-email" className="sr-only">
               Email address
             </label>
@@ -153,7 +153,7 @@ export function MailingListSignup({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="form-input flex-1"
+              className="form-input flex-1 w-full"
               disabled={isLoading}
               aria-describedby={isError ? "email-error" : undefined}
               aria-invalid={isError}
@@ -161,7 +161,7 @@ export function MailingListSignup({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-alt-background text-heading-text hover:bg-alt-background/80 px-3 py-1 text-sm"
+              className="bg-alt-background text-heading-text hover:bg-alt-background/80 px-3 py-2 text-sm w-full sm:w-auto"
             >
               {isLoading ? "..." : buttonText}
             </Button>

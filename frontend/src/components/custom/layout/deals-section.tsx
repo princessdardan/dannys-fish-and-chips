@@ -32,7 +32,7 @@ function DealCard({ deal }: { deal: TSpecialDeal }) {
       {/* Deal Content */}
       <div className="p-6">
         {/* Deal Name */}
-        <h3 className="text-2xl font-bold text-brand-black mb-2">{name}</h3>
+        <h3 className="text-xl sm:text-2xl font-bold text-brand-black mb-2">{name}</h3>
 
         {/* Deal Description */}
         <p className="text-gray-600 mb-4">{description}</p>

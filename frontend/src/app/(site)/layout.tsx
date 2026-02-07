@@ -4,7 +4,6 @@ import "./globals.css";
 import { loaders } from "@/data/loaders";
 import { Header } from "@/components/custom/layout/header";
 import { Footer } from "@/components/custom/layout/footer";
-import { AnnouncementBanner } from "@/components/custom/layout/announcement-banner";
 import { JsonLd } from "@/components/seo/json-ld";
 import { generateRestaurantSchema } from "@/lib/structured-data";
 import { validateApiResponse } from "@/lib/error-handler";
@@ -173,8 +172,11 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
       >
         <div className="flex flex-col min-h-screen">
-          <AnnouncementBanner data={announcementData} />
-          <Header data={globalData?.header} menuItems={mainMenuData?.MainMenuItems} />
+          <Header
+            data={globalData?.header}
+            menuItems={mainMenuData?.MainMenuItems}
+            announcement={announcementData}
+          />
           <main className="grow pt-16 md:pt-50">
             {children}
           </main>

@@ -32,13 +32,14 @@ function useDismissedState(documentId: string | undefined) {
 }
 
 /**
- * Site-wide announcement banner displayed above the header.
+ * Site-wide announcement banner displayed below the header.
  *
  * Features:
  * - Customizable background/text colors from CMS
  * - Optional call-to-action link
- * - Dismissible with localStorage persistence
+ * - Dismissible with localStorage persistence (44x44px touch target)
  * - Time-bound display (filtered server-side)
+ * - Follows header's fixed positioning and scroll behavior
  */
 export function AnnouncementBanner({ data }: AnnouncementBannerProps) {
   const isDismissedFromStorage = useDismissedState(data?.documentId);
@@ -61,7 +62,7 @@ export function AnnouncementBanner({ data }: AnnouncementBannerProps) {
       role="banner"
       aria-label="Site announcement"
     >
-      <p className="text-sm md:text-base font-medium pr-8">
+      <p className="text-sm md:text-base font-medium pr-12">
         {data.message}
         {data.linkText && data.linkUrl && (
           <>
@@ -79,7 +80,7 @@ export function AnnouncementBanner({ data }: AnnouncementBannerProps) {
       {data.isDismissible && (
         <button
           onClick={handleDismiss}
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:opacity-70 transition-opacity"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-3 hover:opacity-70 transition-opacity min-w-11 min-h-11 flex items-center justify-center"
           aria-label="Dismiss announcement"
           style={{ color: data.textColor }}
         >

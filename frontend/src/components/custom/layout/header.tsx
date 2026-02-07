@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { THeader } from "@/types";
+import type { THeader, TAnnouncement } from "@/types";
 import type { IMainMenuItems } from "@/app/(site)/main-menu";
 
 import { Logo } from "@/components/ui/logo";
@@ -10,10 +10,12 @@ import { MobileNavigation } from "@/components/ui/mobile-navigation";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList } from "@/components/ui/navigation-menu";
 import { HeaderWrapper } from "./header-wrapper";
+import { AnnouncementBanner } from "./announcement-banner";
 
 interface IHeaderProps {
   data?: THeader | null;
   menuItems?: IMainMenuItems[];
+  announcement?: TAnnouncement | null;
 }
 
 function HeaderButton({ href, label }: { href: string; label: string }) {
@@ -41,7 +43,7 @@ function HeaderContent({ data, menuItems }: IHeaderProps) {
 
   return (
     <>
-      {/* Mobile header - simplified newspaper style */}
+      {/* Mobile header - newspaper style */}
       <div className="md:hidden w-full">
         {/* Top rule */}
         <div className="masthead-rule" />
@@ -52,8 +54,8 @@ function HeaderContent({ data, menuItems }: IHeaderProps) {
 
           {/* Centered site name */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-            <span className="font-serif font-black text-xl text-brand-black tracking-tight">
-              Danny&apos;s
+            <span className="font-serif font-black text-base sm:text-lg text-brand-red tracking-tight whitespace-nowrap">
+              Danny&apos;s Fish &amp; Chips
             </span>
           </Link>
 
@@ -142,10 +144,11 @@ function HeaderContent({ data, menuItems }: IHeaderProps) {
  * Data flow: consumes global header data and main menu items from Strapi.
  * Layout: responsive navigation (mobile sheet + desktop menu).
  */
-export function Header({ data, menuItems }: IHeaderProps) {
+export function Header({ data, menuItems, announcement }: IHeaderProps) {
   return (
     <HeaderWrapper>
       <HeaderContent data={data} menuItems={menuItems} />
+      <AnnouncementBanner data={announcement ?? null} />
     </HeaderWrapper>
   );
 }

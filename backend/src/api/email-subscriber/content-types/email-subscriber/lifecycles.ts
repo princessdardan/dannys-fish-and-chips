@@ -1,6 +1,9 @@
 /**
  * Lifecycle hooks for email-subscriber.
  *
+ * beforeCreate checks for duplicate emails and throws an ApplicationError
+ * if the email already exists, providing a user-friendly error message.
+ *
  * afterCreate sends:
  * - Admin notification with subscriber email and timestamp.
  * - Subscriber confirmation email.
@@ -8,10 +11,27 @@
  * Permissions note: this runs server-side on create, regardless of API auth.
  */
 
+import { errors } from '@strapi/utils';
+
+const { ApplicationError } = errors;
+
 const ADMIN_EMAIL = 'info@dannysfishandchips.ca';
 const FROM_EMAIL = 'info@dannysfishandchips.ca';
 
 export default {
+  async beforeCreate(event) {
+    const { data } = event.params;
+
+    // Check if email already exists to provide a user-friendly error
+    const existingSubscriber = await strapi.documents('api::email-subscriber.email-subscriber').findFirst({
+      filters: { email: data.email.toLowerCase() }
+    });
+
+    if (existingSubscriber) {
+      throw new ApplicationError('This email is already subscribed to our mailing list.');
+    }
+  },
+
   async afterCreate(event) {
     const { result } = event;
 
@@ -81,7 +101,7 @@ export default {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #c41e3a; border-bottom: 3px solid #c41e3a; padding-bottom: 10px;">
-              🐟 Welcome to Danny's Fish and Chips!
+              Welcome to Danny's Fish and Chips!
             </h1>
             <p style="font-size: 16px; line-height: 1.6; color: #333;">
               Thank you for joining our mailing list!
@@ -90,9 +110,9 @@ export default {
               You'll be the first to know about:
             </p>
             <ul style="font-size: 16px; line-height: 1.8; color: #333;">
-              <li>🍟 Weekly specials and promotions</li>
-              <li>🎉 Upcoming events</li>
-              <li>📰 Restaurant news and updates</li>
+              <li>Weekly specials and promotions</li>
+              <li>Upcoming events</li>
+              <li>Restaurant news and updates</li>
             </ul>
             <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
               <p style="margin: 0; color: #856404;">
