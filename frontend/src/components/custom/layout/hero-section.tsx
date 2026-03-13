@@ -76,7 +76,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
 
                 return (
                   <Link key={btn.id} href={btn.href}>
-                      <Button className="inline-flex border-4 border-brand-black italic items-center text-brand-black font-serif text-base sm:text-lg md:text-xl justify-center px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-8 font-bold bg-[#faf5e9] hover:bg-[#f4e8d0] shadow-2xl transition-all hover:shadow-xl relative" variant="secondary">
+                      <Button className="inline-flex border-4 border-brand-black italic items-center text-brand-black font-serif text-base sm:text-lg md:text-xl justify-center px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-8 font-bold bg-brand-light-cream hover:bg-brand-cream shadow-2xl transition-all hover:shadow-xl relative" variant="secondary">
                           <span className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-brand-red" />
                           <span className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-brand-red" />
                           <span className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-brand-red" />
@@ -135,7 +135,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
 
               return (
                 <Link key={btn.id} href={btn.href}>
-                    <Button className="inline-flex border-4 border-brand-black italic items-center text-brand-black font-serif text-base sm:text-lg md:text-xl justify-center px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-8 font-bold bg-[#faf5e9] hover:bg-[#f4e8d0] shadow-2xl transition-all hover:shadow-xl relative" variant="secondary">
+                    <Button className="inline-flex border-4 border-brand-black italic items-center text-brand-black font-serif text-base sm:text-lg md:text-xl justify-center px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-8 font-bold bg-brand-light-cream hover:bg-brand-cream shadow-2xl transition-all hover:shadow-xl relative" variant="secondary">
                         <span className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-brand-red" />
                         <span className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-brand-red" />
                         <span className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-brand-red" />

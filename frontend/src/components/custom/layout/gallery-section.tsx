@@ -17,7 +17,7 @@ export function GallerySection({ data }: { data: IGallerySectionProps }) {
   if (!images || !Array.isArray(images) || images.length === 0) return null;
 
   return (
-    <section className="px-2 py-8 mx-auto md:px-6 lg:pt-12 lg:pb-16 bg-brand-pink overflow-hidden">
+    <section className="px-2 py-8 mx-auto md:px-6 lg:pt-12 lg:pb-16 bg-brand-cream  overflow-hidden">
       <div className="container mx-auto max-w-2xl">
         <div className="text-container max-w-4xl mx-auto">
           <h2 className="section-heading-red">{heading}</h2>

@@ -119,9 +119,25 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dannysfishandchips
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = await loaders.getMetaData();
 
+  const title = metadata?.data?.title ?? "Danny’s Fish & Chips | Barrie, ON | Since 1975";
+  const description = metadata?.data?.description ?? "A Barrie favourite, Danny’s Fish & Chips has served crispy battered fish and golden chips across Ontario since 1975—family-owned and made fresh.";
+
   return {
-    title: metadata?.data?.title ?? "Danny's Fish & Chips | Barrie, ON | Since 1975",
-    description: metadata?.data?.description ?? "A Barrie favourite, Danny’s Fish & Chips has served crispy battered fish and golden chips across Ontario since 1975—family-owned and made fresh.",
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      locale: "en_CA",
+      siteName: "Danny’s Fish & Chips",
+      url: SITE_URL,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

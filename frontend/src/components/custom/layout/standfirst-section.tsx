@@ -28,7 +28,7 @@ export function StandfirstSection({ data }: { data: IStandfirstSectionProps }) {
   }
 
   return (
-    <section className="bg-[#f4e8d0] py-12 md:py-16 relative overflow-hidden">
+    <section className="bg-brand-cream py-12 md:py-16 relative overflow-hidden">
       {/* Vintage paper texture overlay */}
       <div className="paper-texture absolute inset-0 opacity-[0.03] pointer-events-none" />
 
@@ -41,7 +41,7 @@ export function StandfirstSection({ data }: { data: IStandfirstSectionProps }) {
         </div>
 
         {/* Main card */}
-        <div className="bg-[#faf5e9] border-4 border-brand-black shadow-2xl p-6 md:p-10 relative">
+        <div className="bg-brand-light-cream border-4 border-brand-black shadow-2xl p-6 md:p-10 relative">
           {/* Corner decorations */}
           <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-brand-red" />
           <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-brand-red" />

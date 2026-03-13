@@ -39,11 +39,19 @@ export function StrapiImage({
 }: Readonly<IStrapiMediaProps>) {
   const imageUrl = getStrapiMedia(src);
   if (!imageUrl) return null;
+
+  const resolvedAlt = alt ?? "";
+
+  if (process.env.NODE_ENV === "development" && !alt) {
+    console.warn(`[StrapiImage] Missing alt text for image: ${src}`);
+  }
+
   return (
     <Image
       src={imageUrl}
-      alt={alt ?? "No alternative text provided"}
+      alt={resolvedAlt}
       className={className}
+      {...(resolvedAlt === "" && { "aria-hidden": true })}
       {...rest}
     />
   );

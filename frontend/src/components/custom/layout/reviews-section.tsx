@@ -1,10 +1,29 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { IReviewsSectionProps } from "@/types";
 
 interface ReviewsSectionComponentProps {
   data: IReviewsSectionProps;
+}
+
+const ALLOWED_SCRIPT_DOMAINS = [
+  "elfsight.com",
+  "google.com",
+  "googleapis.com",
+  "tripadvisor.com",
+  "yelp.com",
+];
+
+function isAllowedScriptSource(src: string): boolean {
+  try {
+    const url = new URL(src);
+    return ALLOWED_SCRIPT_DOMAINS.some((domain) =>
+      url.hostname.endsWith(domain)
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -16,23 +35,54 @@ interface ReviewsSectionComponentProps {
  * - TripAdvisor widgets
  * - Custom embed codes
  *
- * The widget is lazy-loaded to avoid blocking page render.
+ * Security: Only scripts from allowlisted domains are executed.
+ * Performance: Widget is lazy-loaded via IntersectionObserver.
  */
 export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
+  const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const { heading, subHeading, widgetType, widgetEmbedCode } = data;
 
+  // Lazy-load: observe the section and flip `isVisible` when near viewport
   useEffect(() => {
-    if (!containerRef.current || !widgetEmbedCode) return;
+    if (!sectionRef.current) return;
 
-    // Parse and execute any scripts in the embed code
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  // Inject the widget HTML and execute allowed scripts once visible
+  useEffect(() => {
+    if (!isVisible || !containerRef.current || !widgetEmbedCode) return;
+
     const container = containerRef.current;
     container.innerHTML = widgetEmbedCode;
 
-    // Find and execute any script tags
     const scripts = container.querySelectorAll("script");
     scripts.forEach((oldScript) => {
+      const src = oldScript.getAttribute("src");
+
+      // Block scripts from untrusted domains
+      if (src && !isAllowedScriptSource(src)) {
+        oldScript.remove();
+        return;
+      }
+
       const newScript = document.createElement("script");
 
       // Copy attributes
@@ -53,7 +103,7 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
         container.innerHTML = "";
       }
     };
-  }, [widgetEmbedCode]);
+  }, [isVisible, widgetEmbedCode]);
 
   // Don't render if no embed code provided
   if (!widgetEmbedCode) {
@@ -61,15 +111,11 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
   }
 
   return (
-    <section className="bg-background py-16">
-      <div className="container mx-auto px-4">
+    <section ref={sectionRef} className="bg-background py-16">
+      <div className="section-container-cream">
         {/* Section Header */}
         <div className="text-center mb-12">
-          {heading && (
-            <h2 className="text-4xl md:text-5xl font-bold text-heading-text mb-4">
-              {heading}
-            </h2>
-          )}
+          {heading && <h2 className="section-heading-red-center">{heading}</h2>}
           {subHeading && (
             <p className="text-brand-red font-serif text-lg italic">
               {subHeading}
@@ -77,12 +123,14 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
           )}
         </div>
 
-        {/* Widget Container */}
-        <div
-          ref={containerRef}
-          className="reviews-widget-container"
-          aria-label={`${widgetType} reviews widget`}
-        />
+        {/* Widget Container — newspaper "readers write" frame */}
+        <div className="border-t-2 border-b-2 border-brand-black/20 py-8">
+          <div
+            ref={containerRef}
+            className="reviews-widget-container"
+            aria-label={`${widgetType} reviews widget`}
+          />
+        </div>
       </div>
     </section>
   );
