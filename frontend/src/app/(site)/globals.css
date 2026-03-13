@@ -196,11 +196,11 @@
   }
 
   .section-container-pink {
-    @apply px-8 py-4 mx-auto md:px-6 lg:pt-12 bg-white;
+    @apply px-8 py-4 mx-auto md:px-6 lg:pt-12 bg-brand-pink;
   }
 
   .section-container-cream {
-    @apply px-8 py-4 mx-auto md:px-6 lg:py-12 bg-yellow-200;
+    @apply px-8 py-4 mx-auto md:px-6 lg:py-12 bg-brand-cream;
   }
 
   /* Section Headings - Large page titles */
