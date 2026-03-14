@@ -457,6 +457,17 @@ export interface IReviewsSectionProps {
   tripAdvisorUrl?: string;
 }
 
+// Elfsight widget global type augmentation
+declare global {
+  interface Window {
+    eapps?: {
+      instance?: {
+        initWidgets: () => void;
+      };
+    };
+  }
+}
+
 // Standfirst Section types
 export interface IStandfirstSectionProps {
   id: number;
