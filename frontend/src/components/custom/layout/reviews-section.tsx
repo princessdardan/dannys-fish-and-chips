@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Script from "next/script";
 import type { IReviewsSectionProps } from "@/types";
 
 interface ReviewsSectionComponentProps {
@@ -10,6 +9,7 @@ interface ReviewsSectionComponentProps {
 
 const ALLOWED_SCRIPT_DOMAINS = [
   "elfsight.com",
+  "elfsightcdn.com",
   "google.com",
   "googleapis.com",
   "tripadvisor.com",
@@ -28,57 +28,61 @@ function isAllowedScriptSource(src: string): boolean {
 }
 
 /**
- * Parses an HTML embed code string into its widget HTML and script URL.
+ * Parses an HTML embed code string into its widget HTML and script attributes.
  * Uses DOMParser to safely separate the two so they can be handled independently.
+ * Preserves ALL script attributes (src, defer, data-use-service-core, etc.)
+ * because Elfsight and other widget platforms depend on them.
  */
 function parseEmbedCode(embedCode: string): {
   widgetHtml: string;
-  scriptSrc: string | null;
+  scriptAttrs: Record<string, string> | null;
 } {
   const parser = new DOMParser();
   const doc = parser.parseFromString(embedCode, "text/html");
 
-  let scriptSrc: string | null = null;
+  let scriptAttrs: Record<string, string> | null = null;
 
-  // Extract the first allowed script src
   const scripts = doc.querySelectorAll("script");
   scripts.forEach((script) => {
     const src = script.getAttribute("src");
-    if (src && isAllowedScriptSource(src) && !scriptSrc) {
-      scriptSrc = src;
+    if (src && isAllowedScriptSource(src) && !scriptAttrs) {
+      scriptAttrs = {};
+      Array.from(script.attributes).forEach((attr) => {
+        scriptAttrs![attr.name] = attr.value;
+      });
     }
     script.remove();
   });
 
-  // Remaining HTML is the widget div(s)
   const widgetHtml = doc.body.innerHTML.trim();
-
-  return { widgetHtml, scriptSrc };
+  return { widgetHtml, scriptAttrs };
 }
 
 /**
  * Reviews/Testimonials section that embeds third-party review widgets.
  *
- * Supports:
- * - Elfsight widgets (recommended - free tier available)
- * - Google Reviews via embed code
- * - TripAdvisor widgets
- * - Custom embed codes
- *
  * Security: Only scripts from allowlisted domains are executed.
  * Performance: Widget is lazy-loaded via IntersectionObserver.
+ *
+ * Script loading strategy: Manual script injection (not next/script) to:
+ * - Preserve all original attributes (data-use-service-core, defer, etc.)
+ * - Detect already-loaded scripts and re-initialize widgets
+ * - Handle React strict mode double-execution gracefully
  */
 export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const widgetContainerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [scriptError, setScriptError] = useState(false);
 
   const { heading, subHeading, widgetType, widgetEmbedCode } = data;
 
-  // Parse embed code into widget HTML and script URL
   const [widgetHtml, setWidgetHtml] = useState<string | null>(null);
-  const [scriptSrc, setScriptSrc] = useState<string | null>(null);
+  const [scriptAttrs, setScriptAttrs] = useState<Record<string, string> | null>(
+    null
+  );
 
+  // Parse embed code into widget HTML and script attributes
   useEffect(() => {
     if (!widgetEmbedCode) {
       if (process.env.NODE_ENV === "development") {
@@ -87,12 +91,12 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
       return;
     }
 
-    const { widgetHtml: html, scriptSrc: src } =
+    const { widgetHtml: html, scriptAttrs: attrs } =
       parseEmbedCode(widgetEmbedCode);
     setWidgetHtml(html);
-    setScriptSrc(src);
+    setScriptAttrs(attrs);
 
-    if (!src && process.env.NODE_ENV === "development") {
+    if (!attrs && process.env.NODE_ENV === "development") {
       console.warn(
         "[ReviewsSection] No allowed script source found in embed code. Allowed domains:",
         ALLOWED_SCRIPT_DOMAINS
@@ -121,26 +125,70 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
     };
   }, []);
 
-  // Don't render if no embed code provided
+  // Load the platform script and initialize widgets once the div is in the DOM.
+  // Handles: first load, cached script, strict mode double-execution, SPA navigation.
+  useEffect(() => {
+    if (!isVisible || !widgetHtml || !scriptAttrs) return;
+
+    const src = scriptAttrs.src;
+    if (!src) return;
+
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+    function tryInitWidgets(): boolean {
+      if (window.eapps?.instance?.initWidgets) {
+        window.eapps.instance.initWidgets();
+        return true;
+      }
+      return false;
+    }
+
+    function pollForInit(): void {
+      if (tryInitWidgets()) return;
+
+      let attempts = 0;
+      pollTimer = setInterval(() => {
+        if (tryInitWidgets() || ++attempts >= 20) {
+          if (pollTimer) clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }, 500);
+    }
+
+    // Check if the script tag already exists in the DOM (cached, HMR, strict mode)
+    const existingScript = Array.from(
+      document.querySelectorAll("script")
+    ).find((s) => s.getAttribute("src") === src);
+
+    if (existingScript) {
+      // Script already present — just re-initialize widgets
+      pollForInit();
+    } else {
+      // Inject the script with ALL original attributes preserved
+      const script = document.createElement("script");
+      Object.entries(scriptAttrs).forEach(([key, value]) => {
+        script.setAttribute(key, value);
+      });
+      script.onload = () => pollForInit();
+      script.onerror = () => {
+        setScriptError(true);
+        if (process.env.NODE_ENV === "development") {
+          console.warn(
+            "[ReviewsSection] Failed to load widget script:",
+            src
+          );
+        }
+      };
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      if (pollTimer) clearInterval(pollTimer);
+    };
+  }, [isVisible, widgetHtml, scriptAttrs]);
+
   if (!widgetEmbedCode) {
     return null;
-  }
-
-  function handleScriptLoad(): void {
-    // Force Elfsight to re-scan for widget divs added after initial load
-    if (window.eapps?.instance?.initWidgets) {
-      window.eapps.instance.initWidgets();
-    }
-  }
-
-  function handleScriptError(): void {
-    setScriptError(true);
-    if (process.env.NODE_ENV === "development") {
-      console.warn(
-        "[ReviewsSection] Failed to load widget script:",
-        scriptSrc
-      );
-    }
   }
 
   return (
@@ -156,7 +204,7 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
           )}
         </div>
 
-        {/* Widget Container — newspaper "readers write" frame */}
+        {/* Widget Container */}
         <div className="border-t-2 border-b-2 border-brand-black/20 py-8">
           {scriptError ? (
             <p className="text-center text-brand-black/50 text-sm italic">
@@ -164,6 +212,7 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
             </p>
           ) : (
             <div
+              ref={widgetContainerRef}
               className="reviews-widget-container"
               aria-label={`${widgetType} reviews widget`}
               {...(isVisible && widgetHtml
@@ -173,16 +222,6 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
           )}
         </div>
       </div>
-
-      {/* Load widget script via next/script for proper deduplication and lifecycle */}
-      {isVisible && scriptSrc && (
-        <Script
-          src={scriptSrc}
-          strategy="afterInteractive"
-          onLoad={handleScriptLoad}
-          onError={handleScriptError}
-        />
-      )}
     </section>
   );
 }
