@@ -75,7 +75,7 @@ function AddressCard({
       </div>
 
       <div
-        className="w-full h-62.5 overflow-hidden border border-brand-black/30 mb-4"
+        className="w-full h-48 md:h-64 overflow-hidden border border-brand-black/30 mb-4"
         role="img"
         aria-label={`Map showing the location of ${fullAddress}`}
       >
@@ -161,7 +161,7 @@ export function LocationSection({ data }: { data: ILocationSectionProps }) {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div>
             <OperatingHoursCard hours={operatingHours || []} />
           </div>

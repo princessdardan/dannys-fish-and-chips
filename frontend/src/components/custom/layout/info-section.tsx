@@ -133,7 +133,7 @@ export function InfoSection({ data }: { data: IInfoSectionProps }) {
                 {/* Section Header */}
                 <div className="text-center mb-12">
                     {heading && (
-                        <h2 className="text-4xl md:text-5xl font-bold text-heading-text mb-4">
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-heading-text mb-4">
                             {heading}
                         </h2>
                     )}

@@ -79,12 +79,12 @@ export function BlockRenderer({ content }: BlockRendererProps) {
             const HeadingTag = `h${block.level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
             
             const headingStyles = {
-              1: "text-4xl text-center font-bold text-brand-red mb-4",
-              2: "text-3xl text-center font-semibold text-brand-red mb-3",
-              3: "text-2xl text-center font-semibold text-brand-red font-serif mb-3",
-              4: "text-xl text-center font-medium text-brand-red mb-2",
-              5: "text-lg text-center font-medium text-brand-red mb-1",
-              6: "text-base text-center font-medium text-brand-red mb-1",
+              1: "text-2xl md:text-3xl lg:text-4xl text-center font-bold text-brand-red mb-4",
+              2: "text-xl md:text-2xl lg:text-3xl text-center font-semibold text-brand-red mb-3",
+              3: "text-lg md:text-xl lg:text-2xl text-center font-semibold text-brand-red font-serif mb-3",
+              4: "text-base md:text-lg lg:text-xl text-center font-medium text-brand-red mb-2",
+              5: "text-sm md:text-base lg:text-lg text-center font-medium text-brand-red mb-1",
+              6: "text-sm md:text-base text-center font-medium text-brand-red mb-1",
             };
             
             return (

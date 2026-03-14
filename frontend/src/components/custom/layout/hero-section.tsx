@@ -52,8 +52,8 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
             alt={mediaAlt}
             className="absolute inset-0 object-cover w-full h-full"
             src={media.url}
-            height={2160}
-            width={3840}
+            fill
+            sizes="100vw"
           />
         )}
         <div className="relative px-8 py-4 z-10 flex flex-col items-center justify-center h-full bg-black/60 text-center">
@@ -94,7 +94,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
 
   // Homepage variant (default)
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative h-dvh overflow-hidden">
       {isVideo && media && (
         <StrapiVideo
           src={media.url}
@@ -108,10 +108,10 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
       {isImage && media && (
         <StrapiImage
           alt={mediaAlt}
-          className="absolute inset-0 object-cover w-full h-full aspect/16:9"
+          className="absolute inset-0 object-cover w-full h-full"
           src={media.url}
-          height={2160}
-          width={3840}
+          fill
+          sizes="100vw"
         />
       )}
       <div className="relative px-8 py-4 z-10 flex flex-col items-center justify-center h-full bg-black/50 text-center">

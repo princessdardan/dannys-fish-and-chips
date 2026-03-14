@@ -192,15 +192,15 @@
 
   /* Section Containers */
   .section-container {
-    @apply px-8 py-4 mx-auto md:px-6 lg:pt-12;
+    @apply px-4 md:px-6 lg:px-8 py-4 mx-auto lg:pt-12;
   }
 
   .section-container-pink {
-    @apply px-8 py-4 mx-auto md:px-6 lg:pt-12 bg-brand-pink;
+    @apply px-4 md:px-6 lg:px-8 py-4 mx-auto lg:pt-12 bg-brand-pink;
   }
 
   .section-container-cream {
-    @apply px-8 py-4 mx-auto md:px-6 lg:py-12 bg-brand-cream;
+    @apply px-4 md:px-6 lg:px-8 py-4 mx-auto lg:py-12 bg-brand-cream;
   }
 
   /* Section Headings - Large page titles */
@@ -285,7 +285,7 @@
   }
 
   .card-heading {
-    @apply mb-4 text-3xl font-bold font-serif;
+    @apply mb-4 text-xl md:text-2xl lg:text-3xl font-bold font-serif;
   }
   .card-subheading-black {
     @apply max-w-lg mt-auto text-black;
@@ -293,7 +293,7 @@
 
   /* Form Inputs */
   .form-input {
-    @apply flex h-9 w-full rounded-md border border-input bg-white text-black px-3 py-1 text-base shadow-sm transition-colors;
+    @apply flex h-11 md:h-9 w-full rounded-md border border-input bg-white text-black px-3 py-1 text-base shadow-sm transition-colors;
     @apply placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
     @apply disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
   }
@@ -319,16 +319,6 @@
   }
 
   /* CTA Buttons */
-  .btn-hero {
-    @apply inline-flex border-[1.5px] border-brand-red italic items-center text-brand-red font-serif text-xl justify-center px-10 py-8 font-bold bg-white hover:bg-white/90;
-    text-shadow:
-      0 1px 0 #ffffff,
-      0 2px 0 #f1f1f1,
-      0 3px 0 #f6f6f6,
-      0 4px 5px rgba(0,0,0,.1),
-      0 5px 10px rgba(0,0,0,.15);
-  }
-
   .btn-primary-red {
     @apply w-full text-white font-extrabold border border-black bg-brand-red hover:bg-brand-red/80;
   }
@@ -677,6 +667,9 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  a, button, [role="button"], input, select, textarea {
+    touch-action: manipulation;
   }
   html {
     height: 100%;

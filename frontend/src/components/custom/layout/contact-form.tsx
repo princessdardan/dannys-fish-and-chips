@@ -164,7 +164,7 @@ export function ContactForm({
   return (
     <div className={cn("w-full max-w-2xl mx-auto", className)}>
       {heading && (
-        <h2 className="text-3xl font-bold text-brand-red mb-3 font-serif">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-brand-red mb-3 font-serif">
           {heading}
         </h2>
       )}
@@ -271,7 +271,7 @@ export function ContactForm({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-brand-red text-white hover:bg-brand-red/90 px-6 py-2"
+              className="bg-brand-red text-white hover:bg-brand-red/90 px-6 py-2 h-11 md:h-9"
             >
               {isLoading ? "Sending..." : buttonText}
             </Button>

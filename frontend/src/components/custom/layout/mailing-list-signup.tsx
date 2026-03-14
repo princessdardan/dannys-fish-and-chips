@@ -161,7 +161,7 @@ export function MailingListSignup({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-alt-background text-heading-text hover:bg-alt-background/80 px-3 py-2 text-sm w-full sm:w-auto"
+              className="bg-alt-background text-heading-text hover:bg-alt-background/80 px-3 py-2 text-sm w-full sm:w-auto h-11 md:h-9"
             >
               {isLoading ? "..." : buttonText}
             </Button>

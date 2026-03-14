@@ -66,13 +66,13 @@ export function MobileNavigation({ ctaButton, menuItems = [] }: MobileNavigation
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-75 sm:w-100 flex flex-col h-full">
+      <SheetContent side="left" className="w-[85vw] max-w-sm flex flex-col h-full">
         <SheetHeader>
           <SheetTitle className="text-brand-red">
             <Link href="/" onClick={() => setOpen(false)}><DannysLogo className="mx-auto w-46 h-46"/></Link>
           </SheetTitle>
         </SheetHeader>
-        <nav className="flex flex-col gap-2 flex-1 overflow-y-auto py-4" aria-label="Mobile navigation">
+        <nav className="flex flex-col gap-2 flex-1 overflow-y-auto overscroll-contain py-4" aria-label="Mobile navigation">
           {menuItems.map((item) => {
             // Render simple menu link
             if (isMenuLink(item)) {

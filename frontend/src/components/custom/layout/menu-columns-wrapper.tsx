@@ -67,14 +67,21 @@ export function MenuColumnsWrapper({ children }: MenuColumnsWrapperProps) {
     // Initial calculation after render
     calculateBorders();
 
-    // Recalculate on resize
-    window.addEventListener("resize", calculateBorders);
+    // Debounce resize to avoid layout thrashing from getBoundingClientRect
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const debouncedCalculate = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(calculateBorders, 150);
+    };
+
+    window.addEventListener("resize", debouncedCalculate);
 
     // Also recalculate after images/fonts load which may affect layout
     window.addEventListener("load", calculateBorders);
 
     return () => {
-      window.removeEventListener("resize", calculateBorders);
+      clearTimeout(resizeTimer);
+      window.removeEventListener("resize", debouncedCalculate);
       window.removeEventListener("load", calculateBorders);
     };
   }, [children]);
