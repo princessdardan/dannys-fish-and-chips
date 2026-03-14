@@ -19,7 +19,7 @@ export default async function ContactUsPage() {
     <main>
       {renderLayoutBlocks({ blocks: data.blocks, pageContext: "contact-us" })}
 
-      <section className="bg-background py-16">
+      <section className="bg-background">
         <div className="container mx-auto px-4">
           <ContactForm />
         </div>

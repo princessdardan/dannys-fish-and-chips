@@ -88,7 +88,7 @@ export function DealsSection({ data }: { data: IDealsSectionProps }) {
   const hasDeals = deals && deals.length > 0;
 
   return (
-    <section className="bg-background py-16">
+    <section className="bg-background">
       <div className="section-container-cream">
         <div className="text-center mb-12">
           {heading && <h2 className="section-heading-red-center">{heading}</h2>}

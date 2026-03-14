@@ -111,7 +111,7 @@ export function ReviewsSection({ data }: ReviewsSectionComponentProps) {
   }
 
   return (
-    <section ref={sectionRef} className="bg-background py-16">
+    <section ref={sectionRef} className="bg-background">
       <div className="section-container-cream">
         {/* Section Header */}
         <div className="text-center mb-12">
