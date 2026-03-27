@@ -26,6 +26,8 @@ jobs:
       - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
+        env:
+          MOTION_DEV_TOKEN: ${{ secrets.MOTION_DEV_TOKEN }}
 
       - name: Install Playwright Browsers
         working-directory: ./frontend
