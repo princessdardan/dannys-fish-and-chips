@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { BlockRenderer } from "@/components/ui/block-renderer";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { StrapiVideo } from "@/components/ui/strapi-video";
+import { cn } from "@/lib/utils";
 import { IInfoSectionProps, IInfoWithMedia } from "./info-section";
 
 /**
@@ -78,7 +80,7 @@ export function NewspaperArticle({ data, index }: { data: IInfoWithMedia; index:
 export function NewspaperInfoSection({ data }: { data: IInfoSectionProps }) {
     if (!data) return null;
 
-    const { heading, subHeading, description, features } = data;
+    const { heading, subHeading, description, features, link } = data;
 
     return (
         <section className="bg-brand-cream py-12 relative overflow-hidden">
@@ -137,6 +139,40 @@ export function NewspaperInfoSection({ data }: { data: IInfoSectionProps }) {
                             <NewspaperArticle key={feature.id} data={feature} index={index} />
                         ))}
                     </div>
+
+                    {/* CTA Button */}
+                    {link && (
+                        <div className="text-center mt-10 pt-6 border-t border-brand-black/20">
+                            <Link
+                                href={link.href}
+                                className={cn(
+                                    "inline-flex items-center gap-2",
+                                    "px-6 py-3 bg-brand-red text-white font-semibold",
+                                    "border-2 border-brand-red",
+                                    "transition-all duration-200",
+                                    "hover:bg-transparent hover:text-brand-red",
+                                    "focus:outline-none focus:ring-2 focus:ring-brand-red focus:ring-offset-2"
+                                )}
+                                {...(link.isExternal && { target: "_blank", rel: "noopener noreferrer" })}
+                            >
+                                {link.label}
+                                <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                    />
+                                </svg>
+                            </Link>
+                        </div>
+                    )}
 
                     {/* Bottom banner */}
                     <div className="border-t-2 border-brand-black mt-10 pt-5 text-center">

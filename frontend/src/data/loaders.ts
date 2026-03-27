@@ -44,6 +44,9 @@ const STANDARD_BLOCKS_POPULATE = {
               },
             },
           },
+          link: {
+            populate: true,
+          },
         },
       },
       "layout.reviews-section": {
@@ -111,6 +114,9 @@ const HOURS_LOCATION_BLOCKS_POPULATE = {
               },
             },
           },
+          link: {
+            populate: true,
+          },
         },
       },
       "layout.location-section": {
@@ -146,6 +152,9 @@ const SPECIAL_BLOCKS_POPULATE = {
                 populate: true,
               },
             },
+          },
+          link: {
+            populate: true,
           },
         },
       },
