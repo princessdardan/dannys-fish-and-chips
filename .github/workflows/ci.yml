@@ -113,6 +113,12 @@ jobs:
         exit 1
 
     # --- Frontend build ---
+    - name: Setup motion-plus package
+      working-directory: ./frontend
+      run: node scripts/setup-motion.mjs
+      env:
+        MOTION_DEV_TOKEN: ${{ secrets.MOTION_DEV_TOKEN }}
+
     - name: Install frontend dependencies
       working-directory: ./frontend
       run: npm ci
