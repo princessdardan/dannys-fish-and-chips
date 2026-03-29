@@ -538,6 +538,45 @@ export interface ApiAnnouncementAnnouncement extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiAnnouncementPageAnnouncementPage
+  extends Struct.SingleTypeSchema {
+  collectionName: 'announcement_pages';
+  info: {
+    description: 'Time-sensitive announcement page with blocks and homepage embedding control.';
+    displayName: 'Announcement Page';
+    pluralName: 'announcement-pages';
+    singularName: 'announcement-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    blocks: Schema.Attribute.DynamicZone<
+      ['layout.hero-section', 'layout.info-section']
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    endDate: Schema.Attribute.DateTime;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::announcement-page.announcement-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    showOnHomepage: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    startDate: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiContactSubmissionContactSubmission
   extends Struct.CollectionTypeSchema {
   collectionName: 'contact_submissions';
@@ -1455,6 +1494,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::about-us.about-us': ApiAboutUsAboutUs;
       'api::announcement.announcement': ApiAnnouncementAnnouncement;
+      'api::announcement-page.announcement-page': ApiAnnouncementPageAnnouncementPage;
       'api::contact-submission.contact-submission': ApiContactSubmissionContactSubmission;
       'api::contact-us.contact-us': ApiContactUsContactUs;
       'api::email-subscriber.email-subscriber': ApiEmailSubscriberEmailSubscriber;
