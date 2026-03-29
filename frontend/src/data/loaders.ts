@@ -12,7 +12,8 @@ import type {
   THoursAndLocation,
   TSpecial,
   TSpecialDeal,
-  TAnnouncement
+  TAnnouncement,
+  TAnnouncementPage
 } from "@/types";
 
 import { api } from "@/data/data-api";
@@ -309,6 +310,28 @@ async function getAnnouncementData(): Promise<TAnnouncement | null> {
 }
 
 /**
+ * Fetches the announcement page data with blocks.
+ * Returns null if not active or outside date range.
+ */
+async function getAnnouncementPageData(): Promise<TStrapiResponse<TAnnouncementPage> | null> {
+  const response = await loadPageData<TAnnouncementPage>("announcement-page");
+
+  if (!response.success || !response.data) return null;
+
+  const page = response.data;
+
+  // Check if announcement page is active
+  if (!page.isActive) return null;
+
+  // Check date range
+  const now = new Date();
+  if (page.startDate && new Date(page.startDate) > now) return null;
+  if (page.endDate && new Date(page.endDate) < now) return null;
+
+  return response;
+}
+
+/**
  * Centralized data loaders for Strapi page/content endpoints.
  *
  * Data flow: each loader builds a Strapi `populate` query and calls `api.get`,
@@ -327,4 +350,5 @@ export const loaders = {
   getSpecialData,
   getSpecialDealsData,
   getAnnouncementData,
+  getAnnouncementPageData,
 };

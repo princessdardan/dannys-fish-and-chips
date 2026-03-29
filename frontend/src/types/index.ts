@@ -428,6 +428,22 @@ export type TContactFormState = {
 };
 
 // Announcement Banner types
+export type TAnnouncementPage = {
+  documentId: string;
+  title: string;
+  description: string;
+  isActive: boolean;
+  startDate?: string;
+  endDate?: string;
+  showOnHomepage: boolean;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  blocks: TAnnouncementPageBlocks[];
+};
+
+export type TAnnouncementPageBlocks = IHeroSectionProps | IInfoSectionProps;
+
 export type TAnnouncement = {
   id: number;
   documentId: string;

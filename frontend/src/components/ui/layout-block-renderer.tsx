@@ -28,7 +28,8 @@ export type PageContext =
   | "hours-and-location" // → InfoSection
   | "special" // → InfoSection
   | "gallery" // → (no info sections)
-  | "home"; // → InfoSection (if any)
+  | "home" // → InfoSection (if any)
+  | "announcement"; // → InfoSection
 
 /**
  * Type for block component registry values

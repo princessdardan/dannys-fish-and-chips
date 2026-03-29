@@ -1,0 +1,51 @@
+{
+  "kind": "singleType",
+  "collectionName": "announcement_pages",
+  "info": {
+    "singularName": "announcement-page",
+    "pluralName": "announcement-pages",
+    "displayName": "Announcement Page",
+    "description": "Time-sensitive announcement page with blocks and homepage embedding control."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "Admin-facing title for the Announcement page."
+    },
+    "description": {
+      "type": "text",
+      "description": "Short summary text for meta/SEO."
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the announcement page is currently active and visible."
+    },
+    "startDate": {
+      "type": "datetime",
+      "description": "Optional start date for the announcement visibility window."
+    },
+    "endDate": {
+      "type": "datetime",
+      "description": "Optional end date for the announcement visibility window."
+    },
+    "showOnHomepage": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to embed announcement blocks on the homepage."
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "layout.hero-section",
+        "layout.info-section"
+      ],
+      "description": "Flexible page sections composed from hero and info blocks."
+    }
+  }
+}
