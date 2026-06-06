@@ -1,6 +1,7 @@
 import { loaders } from "@/data/loaders";
 import { validateApiResponse } from "@/lib/error-handler";
 import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
+import { draftMode } from "next/headers";
 
 export const revalidate = 1800;
 
@@ -10,7 +11,8 @@ export const revalidate = 1800;
  * Data flow: loads page blocks from Strapi and renders via layout block renderer.
  */
 export default async function AboutUsPage() {
-  const aboutUsData = await loaders.getAboutUsData();
+  const draft = await draftMode();
+  const aboutUsData = await loaders.getAboutUsData(draft.isEnabled ? { draftMode: true } : undefined);
   const data = validateApiResponse(aboutUsData, "about us");
 
   return (

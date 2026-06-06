@@ -43,3 +43,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# sanity typegen
+/schema.json
+
+# migration generated output
+/scripts/migration/output/

@@ -1,5 +1,16 @@
 # 🚀 Getting started with Strapi
 
+> **⚠️ LEGACY / ROLLBACK-ONLY**
+>
+> This Strapi backend is being decommissioned as part of the migration to [Sanity Content Lake](https://www.sanity.io).
+> It remains deployed on Railway **only** as a rollback target during the cutover window.
+>
+> - **Active CMS:** Sanity (embedded Studio at `/studio` in the Next.js frontend)
+> - **Rollback window:** Keep Strapi running until Sanity cutover is confirmed stable (minimum 48 hours, recommended 7–14 days)
+> - **Decommission guide:** See `docs/sanity-cutover/STRAPI_DECOMMISSION.md`
+>
+> Do not add new content types or make schema changes to Strapi during this window.
+
 Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
 
 ### `develop`

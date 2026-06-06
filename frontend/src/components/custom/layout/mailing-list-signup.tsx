@@ -3,15 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { api } from "@/data/data-api";
-import { getStrapiURL } from "@/lib/utils";
-import type {
-  TEmailSubscriber,
-  TEmailSubscriberPayload,
-  TMailingListFormState,
-} from "@/types";
+import type { TMailingListFormState } from "@/types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type FormApiResponse =
+  | { ok: true; message: string }
+  | { ok: false; message: string; errors?: unknown };
 
 interface IMailingListSignupProps {
   heading?: string;
@@ -23,11 +21,11 @@ interface IMailingListSignupProps {
 }
 
 /**
- * Mailing list signup form with basic validation and Strapi submission.
+ * Mailing list signup form with basic validation and server-side subscription.
  *
- * Data flow: collects email, posts to `/api/email-subscribers`,
+ * Data flow: collects email, posts to `/api/subscribe`,
  * and renders success/error states.
- * Side effects: network POST to Strapi and local component state updates.
+ * Side effects: network POST to Next.js API route and local component state updates.
  */
 export function MailingListSignup({
   heading = "Join Our Mailing List",
@@ -38,6 +36,7 @@ export function MailingListSignup({
   className,
 }: IMailingListSignupProps) {
   const [email, setEmail] = useState("");
+  const [website, setWebsite] = useState("");
   const [formState, setFormState] = useState<TMailingListFormState>({
     status: "idle",
     message: "",
@@ -56,29 +55,6 @@ export function MailingListSignup({
     return { valid: true, message: "" };
   }
 
-  function handleStrapiError(
-    error:
-      | {
-          status: number;
-          name: string;
-          message: string;
-          details?: Record<string, string[]>;
-        }
-      | undefined
-  ): string {
-    if (!error) return "An unexpected error occurred.";
-
-    if (error.status === 400 && error.message?.includes("unique")) {
-      return "This email is already subscribed to our mailing list.";
-    }
-
-    if (error.details?.email) {
-      return "Please enter a valid email address.";
-    }
-
-    return error.message || "An error occurred. Please try again.";
-  }
-
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -91,26 +67,28 @@ export function MailingListSignup({
     setFormState({ status: "loading", message: "" });
 
     try {
-      const url = getStrapiURL("/api/email-subscribers");
-      const payload: TEmailSubscriberPayload = {
-        data: {
-          email: email.trim().toLowerCase(),
-          subscribedAt: new Date().toISOString(),
-          source,
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      };
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          source,
+          website,
+        }),
+      });
+      const result = (await response.json()) as FormApiResponse;
 
-      const response = await api.post<TEmailSubscriber, TEmailSubscriberPayload>(
-        url,
-        payload
-      );
-
-      if (response.success) {
-        setFormState({ status: "success", message: successMessage });
+      if (response.ok && result.ok) {
+        setFormState({
+          status: "success",
+          message: successMessage || result.message,
+        });
         setEmail("");
+        setWebsite("");
       } else {
-        const errorMessage = handleStrapiError(response.error);
-        setFormState({ status: "error", message: errorMessage });
+        setFormState({ status: "error", message: result.message });
       }
     } catch {
       setFormState({
@@ -143,6 +121,18 @@ export function MailingListSignup({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="sr-only" aria-hidden="true">
+            <label htmlFor="mailing-list-website">Website</label>
+            <input
+              id="mailing-list-website"
+              type="text"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-2">
             <label htmlFor="mailing-list-email" className="sr-only">
               Email address

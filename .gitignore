@@ -88,6 +88,7 @@ RAILWAY_DEPLOYMENT.md
 RAILWAY_ENV_SETUP.md
 VIDEO-OPTIMIZATION-GUIDE.md
 *.md
+!docs/sanity-cutover/*.md
 supabase/.temp/cli-latest
 supabase/.temp/gotrue-version
 supabase/.temp/pooler-url

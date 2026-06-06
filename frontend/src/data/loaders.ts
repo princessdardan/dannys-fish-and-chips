@@ -1,10 +1,21 @@
-import qs from "qs";
+import { fetchDocument, fetchDocuments } from "@/data/data-api";
+import type { FetchOptions } from "@/data/data-api";
+import {
+  homePageQuery,
+  pageBySlugQuery,
+  siteSettingsQuery,
+  mainNavigationQuery,
+  announcementBarQuery,
+  specialDealsQuery,
+  metadataQuery,
+  announcementPageQuery,
+} from "@/sanity/lib/queries";
 import type {
   TStrapiResponse,
-  THomePage,
   TGlobal,
   TMainMenu,
   TMetaData,
+  THomePage,
   TAboutUs,
   TContactUs,
   TFoodAndDrinkMenu,
@@ -13,330 +24,334 @@ import type {
   TSpecial,
   TSpecialDeal,
   TAnnouncement,
-  TAnnouncementPage
+  TAnnouncementPage,
 } from "@/types";
+import type {
+  HomePageQueryResult,
+  SiteSettingsQueryResult,
+  MainNavigationQueryResult,
+  AnnouncementBarQueryResult,
+  SpecialDealsQueryResult,
+  MetadataQueryResult,
+  PageBySlugQueryResult,
+  AnnouncementPageQueryResult,
+} from "../../sanity.types";
 
-import { api } from "@/data/data-api";
-import { getStrapiURL } from "@/lib/utils";
+import {
+  mapToHomePage,
+  mapToAboutUs,
+  mapToContactUs,
+  mapToFoodAndDrinkMenu,
+  mapToGallery,
+  mapToHoursAndLocation,
+  mapToSpecial,
+  mapToAnnouncementPage,
+  resolveSanityImageUrl,
+} from "./sanity-mappers";
 
+// =============================================================================
+// Helpers
+// =============================================================================
 
-const baseUrl = getStrapiURL();
+export type LoaderOptions = FetchOptions;
 
-// Standard populate configuration for pages with hero + info + reviews + standfirst sections
-const STANDARD_BLOCKS_POPULATE = {
-  blocks: {
-    on: {
-      "layout.hero-section": {
-        populate: {
-          media: {
-            populate: true,
-          },
-          link: {
-            populate: true,
-          },
-        },
+function wrapSuccess<T>(data: T | null): TStrapiResponse<T> {
+  if (data === null) {
+    return {
+      success: false,
+      status: 404,
+      error: {
+        status: 404,
+        name: "NotFoundError",
+        message: "Resource not found",
       },
-      "layout.info-section": {
-        populate: {
-          features: {
-            populate: {
-              media: {
-                populate: true,
-              },
-            },
-          },
-          link: {
-            populate: true,
-          },
-        },
-      },
-      "layout.reviews-section": {
-        populate: true,
-      },
-      "layout.standfirst-section": {
-        populate: {
-          media: {
-            populate: true,
-          },
-          link: {
-            populate: true,
-          },
-        },
-      },
-    },
-  },
-};
-
-// Gallery page populate configuration (hero + gallery section)
-const GALLERY_BLOCKS_POPULATE = {
-  blocks: {
-    on: {
-      "layout.hero-section": {
-        populate: {
-          media: {
-            populate: true,
-          },
-          link: {
-            populate: true,
-          },
-        },
-      },
-      "layout.gallery-section": {
-        populate: {
-          images: {
-            populate: true,
-          },
-        },
-      },
-    },
-  },
-};
-
-// Hours and Location page populate configuration
-const HOURS_LOCATION_BLOCKS_POPULATE = {
-  blocks: {
-    on: {
-      "layout.hero-section": {
-        populate: {
-          media: {
-            populate: true,
-          },
-          link: {
-            populate: true,
-          },
-        },
-      },
-      "layout.info-section": {
-        populate: {
-          features: {
-            populate: {
-              media: {
-                populate: true,
-              },
-            },
-          },
-          link: {
-            populate: true,
-          },
-        },
-      },
-      "layout.location-section": {
-        populate: {
-          operatingHours: {
-            populate: true,
-          },
-        },
-      },
-    },
-  },
-};
-
-// Special page populate configuration (hero + info + deals section)
-const SPECIAL_BLOCKS_POPULATE = {
-  blocks: {
-    on: {
-      "layout.hero-section": {
-        populate: {
-          media: {
-            populate: true,
-          },
-          link: {
-            populate: true,
-          },
-        },
-      },
-      "layout.info-section": {
-        populate: {
-          features: {
-            populate: {
-              media: {
-                populate: true,
-              },
-            },
-          },
-          link: {
-            populate: true,
-          },
-        },
-      },
-      "layout.deals-section": {
-        populate: true,
-      },
-    },
-  },
-};
-
-/**
- * Generic page data loader
- * @param endpoint - API endpoint (e.g., "home-page", "about-us")
- * @param populateConfig - Populate configuration (defaults to STANDARD_BLOCKS_POPULATE)
- */
-async function loadPageData<T>(
-  endpoint: string,
-  populateConfig: typeof STANDARD_BLOCKS_POPULATE | typeof GALLERY_BLOCKS_POPULATE | typeof HOURS_LOCATION_BLOCKS_POPULATE | typeof SPECIAL_BLOCKS_POPULATE = STANDARD_BLOCKS_POPULATE
-): Promise<TStrapiResponse<T>> {
-  const query = qs.stringify({ populate: populateConfig });
-  const url = new URL(`/api/${endpoint}`, baseUrl);
-  url.search = query;
-  return api.get<T>(url.href);
+    };
+  }
+  return {
+    success: true,
+    status: 200,
+    data,
+  };
 }
 
-async function getHomePageData(): Promise<TStrapiResponse<THomePage>> {
-  return loadPageData<THomePage>("home-page");
-}
+// =============================================================================
+// Mappers (kept here for re-export and to avoid circular deps with sanity-mappers)
+// =============================================================================
 
-async function getMainMenuData(): Promise<TStrapiResponse<TMainMenu>> {
-  const query = qs.stringify({
-  populate: {
-    MainMenuItems: {
-      on: {
-        "menu.dropdown": {
-          populate: {
-            sections: {
-              populate: {
-                links: {
-                  populate: true,
-                },
-              },
-            },
-          },
-        },
-        "menu.menu-link": {
-          populate:true,
-        },
-      },
+export function mapSiteSettingsToGlobal(
+  settings: SiteSettingsQueryResult
+): TGlobal | null {
+  if (!settings) return null;
+
+  const header = settings.header;
+  const footer = settings.footer;
+
+  const mapLink = (
+    link: {
+      _key: string | null;
+      href: string | null;
+      label: string | null;
+      isExternal: boolean | null;
     },
-  },
-});
-
-  const url = new URL("/api/main-menu", baseUrl);
-  url.search = query;
-  return api.get<TMainMenu>(url.href);
-}
-
-async function getGlobalData(): Promise<TStrapiResponse<TGlobal>> {
-  const query = qs.stringify({
-    populate: [
-      "header.logoText",
-      "header.ctaButton",
-      "footer.logoText",
-      "footer.socialLink",
-    ],
+    index: number
+  ) => ({
+    id: index,
+    href: link.href || "#",
+    label: link.label || "",
+    isExternal: link.isExternal || false,
   });
 
-  const url = new URL("/api/global", baseUrl);
-  url.search = query;
-  return api.get<TGlobal>(url.href);
+  const logoText = header?.logoText;
+  const footerLogoText = footer?.logoText;
+
+  return {
+    documentId: settings._id,
+    title: settings.title || "",
+    description: settings.description || "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    publishedAt: new Date().toISOString(),
+    header: {
+      logoText: logoText
+        ? {
+            id: 0,
+            href: logoText.href || "/",
+            label: logoText.label || "Danny's Fish & Chips",
+            isExternal: logoText.isExternal || false,
+          }
+        : {
+            id: 0,
+            href: "/",
+            label: "Danny's Fish & Chips",
+            isExternal: false,
+          },
+      ctaButton: header?.ctaButton?.map(mapLink) || [],
+    },
+    footer: {
+      logoText: footerLogoText
+        ? {
+            id: 0,
+            href: footerLogoText.href || "/",
+            label: footerLogoText.label || "Danny's Fish & Chips",
+            isExternal: footerLogoText.isExternal || false,
+          }
+        : {
+            id: 0,
+            href: "/",
+            label: "Danny's Fish & Chips",
+            isExternal: false,
+          },
+      text: footer?.text || "© Danny's Fish & Chips",
+      socialLink: footer?.socialLink?.map(mapLink) || [],
+    },
+  };
 }
 
-async function getMetaData(): Promise<TStrapiResponse<TMetaData>> {
-  const query = qs.stringify({
-    fields: ["title", "description"],
+export function mapMainNavigationToMenu(
+  nav: MainNavigationQueryResult
+): TMainMenu | null {
+  if (!nav) return null;
+
+  const items = nav.items || [];
+
+  const menuItems: TMainMenu["MainMenuItems"] = items.map((item, index) => {
+    const children = item.children || [];
+    if (children.length > 0) {
+      return {
+        id: index,
+        __component: "menu.dropdown" as const,
+        title: item.label || "",
+        sections: children.map((section, sIndex) => ({
+          id: sIndex,
+          documentId: section._key,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          publishedAt: new Date().toISOString(),
+          heading: section.sectionTitle || "",
+          links: (section.links || []).map((link, lIndex) => ({
+            id: lIndex,
+            title: link.label || "",
+            url: link.href || "#",
+          })),
+        })),
+      };
+    }
+    return {
+      id: index,
+      __component: "menu.menu-link" as const,
+      title: item.label || "",
+      url:
+        item.url ||
+        (item.page?.slug?.current
+          ? `/${item.page.slug.current}`
+          : "#"),
+    };
   });
 
-  const url = new URL("/api/global", baseUrl);
-  url.search = query;
-  return api.get<TMetaData>(url.href);
+  return {
+    id: 0,
+    documentId: nav._id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    publishedAt: new Date().toISOString(),
+    MainMenuItems: menuItems,
+  };
 }
 
-async function getAboutUsData(): Promise<TStrapiResponse<TAboutUs>> {
-  return loadPageData<TAboutUs>("about-us");
+export function mapAnnouncementBar(
+  announcement: AnnouncementBarQueryResult
+): TAnnouncement | null {
+  if (!announcement) return null;
+
+  return {
+    id: 0,
+    documentId: announcement._id,
+    message: announcement.message || "",
+    linkText: announcement.linkText || undefined,
+    linkUrl: announcement.linkUrl || undefined,
+    backgroundColor: announcement.backgroundColor || "#000000",
+    textColor: announcement.textColor || "#ffffff",
+    isActive: announcement.isActive || false,
+    startDate: announcement.startDate || undefined,
+    endDate: announcement.endDate || undefined,
+    isDismissible: announcement.isDismissible || false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    publishedAt: new Date().toISOString(),
+  };
 }
 
-async function getContactUsData(): Promise<TStrapiResponse<TContactUs>> {
-  return loadPageData<TContactUs>("contact-us");
+export function mapSpecialDeal(
+  deal: SpecialDealsQueryResult[number]
+): TSpecialDeal {
+  const imageUrl = deal.image
+    ? resolveSanityImageUrl(deal.image as Record<string, unknown>, 800, 600)
+    : null;
+
+  return {
+    id: 0,
+    documentId: deal._id,
+    name: deal.name || "",
+    description: deal.description || "",
+    originalPrice: deal.originalPrice || 0,
+    dealPrice: deal.dealPrice || 0,
+    image: imageUrl
+      ? {
+          id: 0,
+          documentId: deal.image?.asset?._id || "",
+          url: imageUrl,
+          alternativeText: deal.image?.alt || null,
+          caption: null,
+          mime: deal.image?.asset?.mimeType || undefined,
+        }
+      : null,
+    itemsIncluded: (deal.itemsIncluded || []).map((item, index) => ({
+      id: index,
+      name: item.name || "",
+      quantity: item.quantity || "",
+    })),
+    isActive: deal.isActive,
+    sortOrder: deal.sortOrder || 0,
+  };
 }
 
-async function getFoodAndDrinkMenuData(): Promise<TStrapiResponse<TFoodAndDrinkMenu>> {
-  return loadPageData<TFoodAndDrinkMenu>("food-and-drink-menu");
+// =============================================================================
+// Loaders
+// =============================================================================
+
+async function getHomePageData(options?: LoaderOptions): Promise<TStrapiResponse<THomePage>> {
+  const data = await fetchDocument<HomePageQueryResult>(homePageQuery, {}, options);
+  return wrapSuccess(data ? mapToHomePage(data) : null);
 }
 
-async function getGalleryData(): Promise<TStrapiResponse<TGallery>> {
-  return loadPageData<TGallery>("gallery", GALLERY_BLOCKS_POPULATE);
+async function getGlobalData(options?: LoaderOptions): Promise<TStrapiResponse<TGlobal>> {
+  const data = await fetchDocument<SiteSettingsQueryResult>(siteSettingsQuery, {}, options);
+  const mapped = data ? mapSiteSettingsToGlobal(data) : null;
+  return wrapSuccess(mapped);
 }
 
-async function getHoursAndLocationData(): Promise<TStrapiResponse<THoursAndLocation>> {
-  return loadPageData<THoursAndLocation>("hours-and-location", HOURS_LOCATION_BLOCKS_POPULATE);
+async function getMainMenuData(options?: LoaderOptions): Promise<TStrapiResponse<TMainMenu>> {
+  const data = await fetchDocument<MainNavigationQueryResult>(mainNavigationQuery, {}, options);
+  const mapped = data ? mapMainNavigationToMenu(data) : null;
+  return wrapSuccess(mapped);
 }
 
-async function getSpecialData(): Promise<TStrapiResponse<TSpecial>> {
-  return loadPageData<TSpecial>("special", SPECIAL_BLOCKS_POPULATE);
-}
-
-async function getSpecialDealsData(): Promise<TStrapiResponse<TSpecialDeal[]>> {
-  const query = qs.stringify({
-    populate: {
-      image: {
-        populate: true,
-      },
-      itemsIncluded: {
-        populate: true,
-      },
-    },
-    filters: {
-      isActive: {
-        $eq: true,
-      },
-    },
-    sort: ["sortOrder:asc"],
+async function getMetaData(options?: LoaderOptions): Promise<TStrapiResponse<TMetaData>> {
+  // Metadata fields must never include stega strings
+  const data = await fetchDocument<MetadataQueryResult>(metadataQuery, {}, {
+    ...options,
+    stega: false,
   });
-
-  const url = new URL("/api/special-deals", baseUrl);
-  url.search = query;
-  return api.get<TSpecialDeal[]>(url.href);
+  if (!data) {
+    return wrapSuccess<TMetaData>(null);
+  }
+  const mapped: TMetaData = {
+    documentId: data._id,
+    title: data.title || "",
+    description: data.description || "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    publishedAt: new Date().toISOString(),
+  };
+  return wrapSuccess(mapped);
 }
 
-/**
- * Fetches the active announcement banner data.
- * Returns null if no announcement is active or outside date range.
- */
-async function getAnnouncementData(): Promise<TAnnouncement | null> {
-  const url = new URL("/api/announcement", baseUrl);
-  const response = await api.get<TAnnouncement>(url.href);
-
-  if (!response.success || !response.data) return null;
-
-  const announcement = response.data;
-
-  // Check if announcement is active
-  if (!announcement.isActive) return null;
-
-  // Check date range
-  const now = new Date();
-  if (announcement.startDate && new Date(announcement.startDate) > now) return null;
-  if (announcement.endDate && new Date(announcement.endDate) < now) return null;
-
-  return announcement;
+async function getAboutUsData(options?: LoaderOptions): Promise<TStrapiResponse<TAboutUs>> {
+  const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "about-us" }, options);
+  return wrapSuccess(data ? mapToAboutUs(data) : null);
 }
 
-/**
- * Fetches the announcement page data with blocks.
- * Returns null if not active or outside date range.
- */
-async function getAnnouncementPageData(): Promise<TStrapiResponse<TAnnouncementPage> | null> {
-  const response = await loadPageData<TAnnouncementPage>("announcement-page");
-
-  if (!response.success || !response.data) return null;
-
-  const page = response.data;
-
-  // Check if announcement page is active
-  if (!page.isActive) return null;
-
-  // Check date range
-  const now = new Date();
-  if (page.startDate && new Date(page.startDate) > now) return null;
-  if (page.endDate && new Date(page.endDate) < now) return null;
-
-  return response;
+async function getContactUsData(options?: LoaderOptions): Promise<TStrapiResponse<TContactUs>> {
+  const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "contact-us" }, options);
+  return wrapSuccess(data ? mapToContactUs(data) : null);
 }
 
-/**
- * Centralized data loaders for Strapi page/content endpoints.
- *
- * Data flow: each loader builds a Strapi `populate` query and calls `api.get`,
- * returning the normalized `TStrapiResponse` used by pages/layout.
- */
+async function getFoodAndDrinkMenuData(options?: LoaderOptions): Promise<TStrapiResponse<TFoodAndDrinkMenu>> {
+  const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "food-and-drink-menu" }, options);
+  return wrapSuccess(data ? mapToFoodAndDrinkMenu(data) : null);
+}
+
+async function getGalleryData(options?: LoaderOptions): Promise<TStrapiResponse<TGallery>> {
+  const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "gallery" }, options);
+  return wrapSuccess(data ? mapToGallery(data) : null);
+}
+
+async function getHoursAndLocationData(options?: LoaderOptions): Promise<TStrapiResponse<THoursAndLocation>> {
+  const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "hours-and-location" }, options);
+  return wrapSuccess(data ? mapToHoursAndLocation(data) : null);
+}
+
+async function getSpecialData(options?: LoaderOptions): Promise<TStrapiResponse<TSpecial>> {
+  const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "special" }, options);
+  return wrapSuccess(data ? mapToSpecial(data) : null);
+}
+
+async function getSpecialDealsData(options?: LoaderOptions): Promise<TStrapiResponse<TSpecialDeal[]>> {
+  const data = await fetchDocuments<SpecialDealsQueryResult[number]>(specialDealsQuery, {}, options);
+  const mapped = data.map(mapSpecialDeal);
+  return wrapSuccess(mapped);
+}
+
+async function getAnnouncementData(options?: LoaderOptions): Promise<TAnnouncement | null> {
+  const data = await fetchDocument<AnnouncementBarQueryResult>(
+    announcementBarQuery,
+    {},
+    options
+  );
+  return data ? mapAnnouncementBar(data) : null;
+}
+
+async function getAnnouncementPageData(options?: LoaderOptions): Promise<TStrapiResponse<TAnnouncementPage> | null> {
+  const data = await fetchDocument<AnnouncementPageQueryResult>(announcementPageQuery, {}, options);
+  const mapped = data ? mapToAnnouncementPage(data) : null;
+  if (!mapped) return null;
+  return wrapSuccess(mapped);
+}
+
+// =============================================================================
+// Exports
+// =============================================================================
+
 export const loaders = {
   getHomePageData,
   getGlobalData,

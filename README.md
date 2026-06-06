@@ -1,6 +1,14 @@
 # Danny's Fish and Chips
 
-A modern full-stack web application for Danny's Fish and Chips restaurant, built with Next.js and Strapi CMS.
+A modern full-stack web application for Danny's Fish and Chips restaurant, built with Next.js and Sanity Content Lake.
+
+> **✅ Frontend CMS migrated to Sanity**
+>
+> This project uses [Sanity Content Lake](https://www.sanity.io) with an embedded Studio as its active CMS.
+> The Strapi 5 backend in `backend/` is retained as legacy/rollback-only infrastructure until formally decommissioned.
+> - **Cutover docs:** See [`docs/sanity-cutover/CUTOVER_CHECKLIST.md`](./docs/sanity-cutover/CUTOVER_CHECKLIST.md)
+> - **Rollback plan:** See [`docs/sanity-cutover/ROLLBACK_PROCEDURE.md`](./docs/sanity-cutover/ROLLBACK_PROCEDURE.md)
+> - **Backend (`backend/`):** Rollback-only — not required for Sanity frontend operation except during rollback, final sync, or decommission checks
 
 ## Tech Stack
 
@@ -11,20 +19,21 @@ A modern full-stack web application for Danny's Fish and Chips restaurant, built
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
 - [Radix UI](https://www.radix-ui.com/) - Accessible component primitives
 
-**Backend:**
-- [Strapi 5](https://strapi.io/) - Headless CMS
-- [PostgreSQL](https://www.postgresql.org/) - Production database
-- [SQLite](https://www.sqlite.org/) - Development database
+**Backend / CMS:**
+- [Sanity Content Lake](https://www.sanity.io/) - Active headless CMS (embedded Studio at `/studio`)
+- [Strapi 5](https://strapi.io/) - **Legacy rollback-only** until formally decommissioned
+- [PostgreSQL](https://www.postgresql.org/) - Strapi production database (legacy)
+- [SQLite](https://www.sqlite.org/) - Strapi development database (legacy)
 
 **DevOps:**
 - [Vercel](https://vercel.com/) - Frontend deployment
-- [Railway](https://railway.app/) - Backend deployment
+- [Railway](https://railway.app/) - Legacy backend deployment (rollback, final sync, decommission)
 - [GitHub Actions](https://github.com/features/actions) - CI/CD pipeline
 
 ## Features
 
 - Server-side rendered pages with Next.js
-- Dynamic content management with Strapi CMS
+- Dynamic content management with Sanity CMS (embedded Studio)
 - Responsive design with Tailwind CSS
 - Type-safe development with TypeScript
 - RESTful API communication
@@ -34,7 +43,7 @@ A modern full-stack web application for Danny's Fish and Chips restaurant, built
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
-- [Node.js 18+](https://nodejs.org/) and npm
+- [Node.js 20+](https://nodejs.org/) and npm (engines `>=20 <=24`)
 - [Git](https://git-scm.com/)
 
 ## Quick Start
@@ -56,7 +65,21 @@ This will install dependencies for the root, backend, and frontend.
 
 ### 3. Environment Setup
 
-**Backend Environment Variables:**
+**Frontend Environment Variables (Sanity — active CMS):**
+
+Create `frontend/.env.local`:
+```env
+# Sanity (active CMS)
+NEXT_PUBLIC_SANITY_PROJECT_ID=jz52wuvq
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2024-06-01
+SANITY_API_READ_TOKEN=your-sanity-read-token
+
+# Strapi (legacy rollback-only)
+NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
+```
+
+**Backend Environment Variables (Strapi — legacy/rollback-only):**
 
 Copy the example environment file:
 ```bash
@@ -78,13 +101,6 @@ ENCRYPTION_KEY=your-encryption-key
 DATABASE_CLIENT=sqlite
 ```
 
-**Frontend Environment Variables:**
-
-Create `frontend/.env.local`:
-```env
-NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
-```
-
 ### 4. Run Development Servers
 
 ```bash
@@ -98,10 +114,11 @@ This runs both frontend and backend concurrently:
 ### 5. Access the Applications
 
 - **Frontend**: http://localhost:3000
-- **Strapi Admin Panel**: http://localhost:1337/admin
-- **Strapi API**: http://localhost:1337/api
+- **Sanity Studio (embedded)**: http://localhost:3000/studio
+- **Strapi Admin Panel** (legacy/rollback-only): http://localhost:1337/admin
+- **Strapi API** (legacy/rollback-only): http://localhost:1337/api
 
-On first run, you'll need to create an admin user for Strapi by visiting the admin panel.
+On first run for legacy Strapi, you'll need to create an admin user by visiting the admin panel.
 
 ## Project Structure
 
@@ -157,7 +174,7 @@ dannys-fish-and-chips/
 
 ## Environment Variables
 
-### Backend
+### Backend (Strapi — legacy/rollback-only)
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
@@ -181,7 +198,22 @@ dannys-fish-and-chips/
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `NEXT_PUBLIC_STRAPI_URL` | Strapi API base URL | Yes | `http://localhost:1337` |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project ID | Yes | `jz52wuvq` |
+| `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset | Yes | `production` |
+| `NEXT_PUBLIC_SANITY_API_VERSION` | Sanity API version | No | `2024-06-01` |
+| `SANITY_API_READ_TOKEN` | Sanity API read token | Yes | - |
+| `NEXT_PUBLIC_STRAPI_URL` | Strapi API base URL (legacy/rollback-only) | No | `http://localhost:1337` |
+
+**Production form handling (server-only — do NOT prefix with `NEXT_PUBLIC_`)**
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `RESEND_API_KEY` | Resend API key for contact/subscribe forms | **Yes** on Vercel production |
+| `RESEND_CONTACT_TO_EMAIL` | Contact form recipient email | **Yes** on Vercel production |
+| `RESEND_FROM_EMAIL` | Contact form sender email | **Yes** on Vercel production |
+| `RESEND_AUDIENCE_ID` | Resend audience ID for newsletter subscriptions | **Yes** on Vercel production |
+
+> **Note:** These are server-only variables used by API routes. Previews and local development without these variables will dry-run forms silently (returning success without sending email). Production deployments on Vercel (`VERCEL_ENV=production`) require these to be set; missing values will return HTTP 500.
 
 ## Development Workflow
 
@@ -191,8 +223,9 @@ dannys-fish-and-chips/
    ```
 
 2. **Make your changes**
-   - Backend: Update content types, controllers, or API routes in `backend/src/`
+   - Sanity CMS: Edit content and schemas via the embedded Studio at `/studio`
    - Frontend: Update pages, components, or styles in `frontend/src/`
+   - Backend (legacy/rollback-only): Update content types, controllers, or API routes in `backend/src/`
 
 3. **Test your changes**
    ```bash
@@ -230,21 +263,22 @@ This project uses a modern CI/CD pipeline with automated deployments.
 
 ### Quick Overview
 
-- **Frontend**: Deployed to Vercel (automatic on push to main)
-- **Backend**: Deployed to Railway (automatic on push to main)
-- **Environments**: Vercel Preview + Production, Railway Production (optional staging via Railway environments)
-- **Database Migrations**: Strapi applies schema updates on startup
+- **Frontend**: Deployed to Vercel automatically on push to main. This branch migrates the code and data path to Sanity; production cutover to Sanity as the active CMS is an operator-executed checklist step documented in [`docs/sanity-cutover/CUTOVER_CHECKLIST.md`](./docs/sanity-cutover/CUTOVER_CHECKLIST.md)
+- **Active CMS**: Sanity Content Lake (hosted by Sanity; no Railway infrastructure required)
+- **Legacy backend**: Strapi on Railway is retained for rollback, final sync, and decommission procedures only
+- **Environments**: Vercel Preview + Production
+- **Database Migrations**: Not applicable for Sanity; Strapi applies schema updates on startup if running
 
 ### Deployment Assumptions (Infrastructure)
 
-- **Environment variables**: Managed in platform settings (Vercel/Railway), never committed.
+- **Environment variables**: Managed in platform settings (Vercel), never committed.
 - **Vercel project root**: `frontend/` with `npm run build` and `npm run start` for production.
-- **Railway service root**: Repository root with `railway.json` build/start commands:
+- **Legacy Railway service** (rollback-only): Repository root with `railway.json` build/start commands:
   - Build: `cd backend && npm ci && npm run build`
   - Start: `cd backend && npm run start`
 - **Alternate Railway root**: `backend/railway.json` supports Railway services rooted at `backend/`.
-- **Health checks**: Railway hits `/_health` on the backend service.
-- **Rollback**: Vercel/Railway dashboards allow redeploying a previous build.
+- **Health checks**: Railway hits `/_health` on the backend service (legacy).
+- **Rollback**: Vercel dashboard allows redeploying a previous build; Strapi on Railway enables rollback to pre-Sanity state.
 - **Preview flow**: Vercel Preview deploys on PRs; GitHub Action `e2e-preview.yml` runs Playwright against the preview URL.
 
 ## Contributing
@@ -280,6 +314,7 @@ This project is private and proprietary.
 ## Support
 
 For issues or questions:
-- Check the [Strapi documentation](https://docs.strapi.io)
+- Review [docs/sanity-cutover/CUTOVER_CHECKLIST.md](./docs/sanity-cutover/CUTOVER_CHECKLIST.md) for deployment and production cutover help
+- Check the [Sanity documentation](https://www.sanity.io/docs)
 - Check the [Next.js documentation](https://nextjs.org/docs)
-- Review [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment help
+- For legacy Strapi issues: Check the [Strapi documentation](https://docs.strapi.io) (rollback-only)

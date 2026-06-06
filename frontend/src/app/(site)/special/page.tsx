@@ -1,6 +1,7 @@
 import { loaders } from "@/data/loaders";
 import { validateApiResponse } from "@/lib/error-handler";
 import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
+import { draftMode } from "next/headers";
 import type { IDealsSectionProps } from "@/types";
 
 export const revalidate = 1800;
@@ -14,10 +15,13 @@ export const revalidate = 1800;
  * 3. Renders the enriched blocks via block renderer
  */
 export default async function SpecialPage() {
+  const draft = await draftMode();
+  const draftOpts = draft.isEnabled ? { draftMode: true } : undefined;
+
   // Fetch page data and deals in parallel
   const [specialData, dealsData] = await Promise.all([
-    loaders.getSpecialData(),
-    loaders.getSpecialDealsData(),
+    loaders.getSpecialData(draftOpts),
+    loaders.getSpecialDealsData(draftOpts),
   ]);
 
   const data = validateApiResponse(specialData, "special");
