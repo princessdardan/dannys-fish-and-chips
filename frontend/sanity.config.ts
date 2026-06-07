@@ -1,4 +1,3 @@
-import { config as loadEnv } from "dotenv";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
@@ -6,8 +5,6 @@ import { presentationTool } from "sanity/presentation";
 
 import { schemaTypes } from "./src/sanity/schemaTypes";
 import { structure } from "./src/sanity/structure";
-
-loadEnv({ path: ".env.local" });
 
 // Placeholder defaults for CLI/schema extraction offline.
 // Runtime env validation lives in src/sanity/env.ts.
