@@ -29,6 +29,7 @@ const siteUrl = resolveSiteUrl();
 export default defineConfig({
   name: "default",
   title: "Danny's Fish \u0026 Chips",
+  basePath: "/studio",
   projectId,
   dataset,
   apiVersion,
