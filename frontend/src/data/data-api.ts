@@ -1,229 +1,128 @@
-import type { TStrapiResponse } from "@/types";
-import { getApiTimeout } from "@/lib/config";
+import "server-only";
 
-type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+import { sanityFetch } from "@/sanity/live";
+import { client } from "@/sanity/client";
+import { serverClient } from "@/sanity/server-client";
+import type { QueryParams } from "@sanity/client";
 
-type ApiOptions<P = Record<string, unknown>> = {
-  method: HTTPMethod;
-  payload?: P;
-  timeoutMs?: number;
-  authToken?: string;
+export const sanityClient = client;
+export const sanityClientAuthenticated = serverClient;
+
+export type FetchOptions = {
+  draftMode?: boolean;
+  stega?: boolean;
+};
+
+type SanityFetchOptions = {
+  query: string;
+  params?: QueryParams;
+  perspective?: "drafts" | "published";
+  stega?: boolean;
+};
+
+type SanityFetchResult<T> = {
+  data: T;
+  sourceMap: unknown;
+  tags: string[];
 };
 
 /**
- * Unified API function with timeout and optional authentication
- *
- * Features:
- * - Supports all HTTP methods (GET, POST, PUT, PATCH, DELETE)
- * - Optional authentication (includes Bearer token when authToken provided)
- * - Timeout protection (8 seconds default)
- * - Consistent error handling and response formatting
- * - Handles DELETE requests without response body parsing
+ * Resolve stega flag from options.
+ * - Explicit stega option is always honored.
+ * - Draft mode defaults to stega enabled (VisualEditing needs source maps).
+ * - Published mode defaults to stega disabled.
  */
-
-async function apiWithTimeout(
-  input: RequestInfo,
-  init: RequestInit = {},
-  timeoutMs = getApiTimeout() // Environment-based timeout
-): Promise<Response> {
-  // Create controller to manage request cancellation
-  const controller = new AbortController();
-
-  // Set up automatic cancellation after timeout period
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(input, {
-      ...init,
-      signal: controller.signal, // Connect the abort signal to fetch
-    });
-    return response;
-  } finally {
-    // Always clean up the timeout to prevent memory leaks
-    // This runs whether the request succeeds, fails, or times out
-    clearTimeout(timeout);
+function resolveStega(options?: FetchOptions): boolean {
+  if (typeof options?.stega === "boolean") {
+    return options.stega;
   }
+  return options?.draftMode ?? false;
 }
 
 /**
- * Perform a Strapi request with JSON payload handling and timeouts.
+ * Fetch a single document from Sanity.
  *
- * Data flow: builds headers/body from options, uses `fetch`, and normalizes
- * Strapi responses into `TStrapiResponse`.
- * Side effects: network I/O, console logging on failures.
+ * Draft mode uses serverClient.fetch directly (bypassing sanityFetch cache)
+ * so draft data is never cached. Published mode routes through sanityFetch
+ * so <SanityLive /> can invalidate via sync tags.
+ *
+ * Metadata fetches should pass stega: false explicitly.
  */
-export async function apiRequest<T = unknown, P = Record<string, unknown>>(
-  url: string,
-  options: ApiOptions<P>
-): Promise<TStrapiResponse<T>> {
-  const { method, payload, timeoutMs = getApiTimeout(), authToken } = options;
+export async function fetchDocument<T>(
+  query: string,
+  params: QueryParams = {},
+  options?: FetchOptions
+): Promise<T | null> {
+  const stega = resolveStega(options);
 
-  // Set up base headers for JSON communication
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  // Include Bearer token if provided (public requests when no token, authenticated when token provided)
-  if (authToken) {
-    headers["Authorization"] = `Bearer ${authToken}`;
-  }
-
-  try {
-    // Make the actual API request with timeout protection
-    const response = await apiWithTimeout(
-      url,
-      {
-        method,
-        headers,
-        // GET and DELETE requests don't have request bodies
-        body:
-          method === "GET" || method === "DELETE"
-            ? undefined
-            : JSON.stringify(payload ?? {}),
-      },
-      timeoutMs
-    );
-
-    // Handle DELETE requests that may not return JSON response body
-    if (method === "DELETE") {
-      return response.ok
-        ? { data: true as T, success: true, status: response.status }
-        : {
-            error: {
-              status: response.status,
-              name: "Error",
-              message: "Failed to delete resource",
-            },
-            success: false,
-            status: response.status,
-          };
-    }
-
-    // Parse the JSON response for all other methods
-    const data = await response.json();
-
-    // Handle unsuccessful responses (4xx, 5xx status codes)
-    if (!response.ok) {
-      console.error(`API ${method} error (${response.status}):`, {
-        url,
-        status: response.status,
-        statusText: response.statusText,
-        data,
-        hasAuthToken: !!authToken,
+  if (options?.draftMode) {
+    try {
+      return await serverClient.fetch<T>(query, params, {
+        perspective: "drafts",
+        stega,
+        // Disable Next.js fetch cache for draft reads
+        next: { revalidate: 0 },
       });
-
-      // If Strapi returns a structured error, pass it through as-is
-      if (data.error) {
-        return {
-          error: data.error,
-          success: false,
-          status: response.status,
-        };
-      }
-
-      // Otherwise create a generic error response
-      return {
-        error: {
-          status: response.status,
-          name: data?.error?.name ?? "Error",
-          message:
-            data?.error?.message ??
-            (response.statusText || "An error occurred"),
-        },
-        success: false,
-        status: response.status,
-      };
+    } catch (error) {
+      console.error("[Sanity] fetchDocument draft error:", error);
+      return null;
     }
+  }
 
-    // Success case - extract Strapi data field to avoid double nesting
-    // Strapi returns: { data: {...}, meta: {...} }
-    // We want to return: { data: {...}, meta: {...}, success: true, status: 200 }
-    const responseData = data.data ? data.data : data;
-    const responseMeta = data.meta ? data.meta : undefined;
-    return {
-      data: responseData as T,
-      meta: responseMeta,
-      success: true,
-      status: response.status,
-    };
-  } catch (error) {
-    // Handle timeout errors specifically (when AbortController cancels the request)
-    if ((error as Error).name === "AbortError") {
-      console.error("Request timed out");
-      return {
-        error: {
-          status: 408,
-          name: "TimeoutError",
-          message: "The request timed out. Please try again.",
-        },
-        success: false,
-        status: 408,
-      } as TStrapiResponse<T>;
-    }
-
-    // Handle network errors, JSON parsing errors, and other unexpected issues
-    console.error(`[API Error] ${method} ${url}`, {
-      error: error instanceof Error ? error.message : String(error),
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
-      suggestion: 'Ensure Strapi backend is running. Check: http://localhost:1337/admin'
+  try {
+    const result = await (
+      sanityFetch as (opts: SanityFetchOptions) => Promise<SanityFetchResult<T>>
+    )({
+      query,
+      params,
+      perspective: "published",
+      stega,
     });
-    return {
-      error: {
-        status: 500,
-        name: "NetworkError",
-        message:
-          error instanceof Error ? error.message : "Something went wrong",
-      },
-      success: false,
-      status: 500,
-    } as TStrapiResponse<T>;
+    return result.data;
+  } catch (error) {
+    console.error("[Sanity] fetchDocument error:", error);
+    return null;
   }
 }
 
 /**
- * Convenience API methods that support both public and authenticated requests
+ * Fetch multiple documents from Sanity.
  *
- * Usage examples:
- * // Public request
- * const homePage = await api.get<THomePage>('/api/home-page');
- *
- * // Authenticated request
- * const userProfile = await api.get<TUser>('/api/users/me', { authToken: 'your-token' });
+ * Draft mode uses serverClient.fetch directly; published mode routes through
+ * sanityFetch for Live Content API integration.
  */
-/**
- * Typed convenience wrapper for common HTTP verbs.
- *
- * Data flow: delegates to `apiRequest` with the appropriate method.
- * Side effects: network I/O and error logging (via `apiRequest`).
- */
-export const api = {
-  get: <T>(
-    url: string,
-    options: { timeoutMs?: number; authToken?: string } = {}
-  ) => apiRequest<T>(url, { method: "GET", ...options }),
+export async function fetchDocuments<T>(
+  query: string,
+  params: QueryParams = {},
+  options?: FetchOptions
+): Promise<T[]> {
+  const stega = resolveStega(options);
 
-  post: <T, P = Record<string, unknown>>(
-    url: string,
-    payload: P,
-    options: { timeoutMs?: number; authToken?: string } = {}
-  ) => apiRequest<T, P>(url, { method: "POST", payload, ...options }),
+  if (options?.draftMode) {
+    try {
+      return await serverClient.fetch<T[]>(query, params, {
+        perspective: "drafts",
+        stega,
+        next: { revalidate: 0 },
+      });
+    } catch (error) {
+      console.error("[Sanity] fetchDocuments draft error:", error);
+      return [];
+    }
+  }
 
-  put: <T, P = Record<string, unknown>>(
-    url: string,
-    payload: P,
-    options: { timeoutMs?: number; authToken?: string } = {}
-  ) => apiRequest<T, P>(url, { method: "PUT", payload, ...options }),
-
-  patch: <T, P = Record<string, unknown>>(
-    url: string,
-    payload: P,
-    options: { timeoutMs?: number; authToken?: string } = {}
-  ) => apiRequest<T, P>(url, { method: "PATCH", payload, ...options }),
-
-  delete: <T>(
-    url: string,
-    options: { timeoutMs?: number; authToken?: string } = {}
-  ) => apiRequest<T>(url, { method: "DELETE", ...options }),
-};
+  try {
+    const result = await (
+      sanityFetch as (opts: SanityFetchOptions) => Promise<SanityFetchResult<T[]>>
+    )({
+      query,
+      params,
+      perspective: "published",
+      stega,
+    });
+    return result.data;
+  } catch (error) {
+    console.error("[Sanity] fetchDocuments error:", error);
+    return [];
+  }
+}

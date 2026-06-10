@@ -1,5 +1,9 @@
 # Deployment Guide - Vercel
 
+> **Legacy Guidance — Retained for Rollback / Reference Only**
+>
+> This document describes the original Strapi-era deployment path. For the current Sanity production cutover and deployment procedure, follow [docs/sanity-cutover/CUTOVER_CHECKLIST.md](./docs/sanity-cutover/CUTOVER_CHECKLIST.md) instead. Keep this file available only as a rollback reference if the project ever needs to revert to the Strapi stack.
+
 This guide covers deploying Danny's Fish and Chips to Vercel.
 
 ## Prerequisites

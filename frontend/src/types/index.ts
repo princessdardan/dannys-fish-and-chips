@@ -179,7 +179,7 @@ export type THomePage = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: (IHeroSectionProps | IInfoSectionProps | IReviewsSectionProps | IStandfirstSectionProps)[];
+  blocks: LayoutBlock[];
 };
 
 export type THeader = {
@@ -237,10 +237,8 @@ export type TAboutUs = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: TAboutUsPageBlocks[];
+  blocks: LayoutBlock[];
 };
-
-export type TAboutUsPageBlocks = IHeroSectionProps | IInfoSectionProps;
 
 export type TContactUs = {
   documentId: string;
@@ -249,10 +247,8 @@ export type TContactUs = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: TContactUsPageBlocks[];
+  blocks: LayoutBlock[];
 };
-
-export type TContactUsPageBlocks = IHeroSectionProps | IInfoSectionProps;
 
 export type TFoodAndDrinkMenu = {
   documentId: string;
@@ -261,10 +257,8 @@ export type TFoodAndDrinkMenu = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: TFoodAndDrinkMenuBlocks[];
+  blocks: LayoutBlock[];
 };
-
-export type TFoodAndDrinkMenuBlocks = IHeroSectionProps | IInfoSectionProps;
 
 export type TGallery = {
   documentId: string;
@@ -273,10 +267,8 @@ export type TGallery = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: TGalleryPageBlocks[];
+  blocks: LayoutBlock[];
 };
-
-export type TGalleryPageBlocks = IHeroSectionProps | IGallerySectionProps;
 
 export type TGalleryBlocks = IGallerySectionProps;
 
@@ -287,10 +279,8 @@ export type THoursAndLocation = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: THoursAndLocationPageBlocks[];
+  blocks: LayoutBlock[];
 };
-
-export type THoursAndLocationPageBlocks = IHeroSectionProps | IInfoSectionProps | ILocationSectionProps;
 
 export type TSpecial = {
   documentId: string;
@@ -299,7 +289,7 @@ export type TSpecial = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: TSpecialBlocks[];
+  blocks: LayoutBlock[];
 };
 
 export interface IDealItem {
@@ -324,6 +314,7 @@ export type TSpecialDeal = {
 export interface IDealsSectionProps {
   __component: "layout.deals-section";
   id: number;
+  documentId?: string;
   heading: string;
   subHeading?: string;
   description?: string;
@@ -337,6 +328,7 @@ export type TSpecialPageBlocks = TSpecialBlocks;
 export interface IGallerySectionProps {
   __component: "layout.gallery-section";
   id: number;
+  documentId?: string;
   heading: string;
   subHeading: string;
   description: string;
@@ -439,10 +431,8 @@ export type TAnnouncementPage = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  blocks: TAnnouncementPageBlocks[];
+  blocks: LayoutBlock[];
 };
-
-export type TAnnouncementPageBlocks = IHeroSectionProps | IInfoSectionProps;
 
 export type TAnnouncement = {
   id: number;
@@ -464,6 +454,7 @@ export type TAnnouncement = {
 // Reviews Section types
 export interface IReviewsSectionProps {
   id: number;
+  documentId?: string;
   __component: "layout.reviews-section";
   heading: string;
   subHeading?: string;
@@ -492,7 +483,8 @@ export interface IStandfirstSectionProps {
   kicker?: string;
   standfirst: string;
   media?: TMedia;
-  link: TLink;
+  link?: TLink;
   mediaPosition: "left" | "right";
   variant: "featured" | "compact";
+  documentId?: string;
 }

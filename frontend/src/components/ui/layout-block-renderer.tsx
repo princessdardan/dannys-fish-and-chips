@@ -1,4 +1,5 @@
 import React from "react";
+import { stegaClean } from "@sanity/client/stega";
 import { HeroSection } from "@/components/custom/layout/hero-section";
 import { InfoSection } from "@/components/custom/layout/info-section";
 import { NewspaperInfoSection } from "@/components/custom/layout/newspaper-info-section";
@@ -32,6 +33,18 @@ export type PageContext =
   | "announcement"; // → InfoSection
 
 /**
+ * Extended block type that supports both legacy Strapi (__component)
+ * and Sanity (_type/_key) shapes during transition.
+ *
+ * Preserves _id, _type, _key metadata for visual editing and debugging.
+ */
+type LayoutBlockInput = LayoutBlock & {
+  _type?: string;
+  _key?: string;
+  _id?: string;
+};
+
+/**
  * Type for block component registry values
  */
 type BlockComponentType =
@@ -47,9 +60,11 @@ type BlockComponentType =
     ) => JSX.Element | null);
 
 /**
- * Registry mapping block component types to React components
+ * Registry mapping block component types to React components.
+ * Supports both legacy Strapi __component names and Sanity _type names.
  */
 type BlockComponentMap = {
+  // Legacy Strapi types
   "layout.hero-section": typeof HeroSection;
   "layout.gallery-section": typeof GallerySection;
   "layout.location-section": typeof LocationSection;
@@ -57,6 +72,17 @@ type BlockComponentMap = {
   "layout.reviews-section": typeof ReviewsSection;
   "layout.standfirst-section": typeof StandfirstSection;
   "layout.info-section": (
+    props: { data: IInfoSectionProps },
+    context: PageContext
+  ) => JSX.Element | null;
+  // Sanity types
+  heroBlock: typeof HeroSection;
+  galleryBlock: typeof GallerySection;
+  locationBlock: typeof LocationSection;
+  dealsBlock: typeof DealsSection;
+  reviewsBlock: typeof ReviewsSection;
+  standfirstBlock: typeof StandfirstSection;
+  infoBlock: (
     props: { data: IInfoSectionProps },
     context: PageContext
   ) => JSX.Element | null;
@@ -83,9 +109,11 @@ function getInfoSectionComponent(context: PageContext) {
 
 /**
  * Block component registry
- * Maps Strapi __component strings to React components
+ * Maps both legacy Strapi __component strings and Sanity _type strings
+ * to React components.
  */
 const BLOCK_COMPONENTS: BlockComponentMap = {
+  // Legacy Strapi types
   "layout.hero-section": HeroSection,
   "layout.gallery-section": GallerySection,
   "layout.location-section": LocationSection,
@@ -96,20 +124,35 @@ const BLOCK_COMPONENTS: BlockComponentMap = {
     const Component = getInfoSectionComponent(context);
     return <Component {...props} />;
   },
+  // Sanity types
+  heroBlock: HeroSection,
+  galleryBlock: GallerySection,
+  locationBlock: LocationSection,
+  dealsBlock: DealsSection,
+  reviewsBlock: ReviewsSection,
+  standfirstBlock: StandfirstSection,
+  infoBlock: (props, context) => {
+    const Component = getInfoSectionComponent(context);
+    return <Component {...props} />;
+  },
 };
 
 /**
  * Options for renderLayoutBlocks function
  */
 interface RenderLayoutBlocksOptions {
-  blocks: LayoutBlock[];
+  blocks: LayoutBlockInput[];
   pageContext: PageContext;
 }
 
 /**
- * Renders an array of layout blocks using the component registry
+ * Renders an array of layout blocks using the component registry.
  *
- * @param blocks - Array of block objects from Strapi
+ * Supports both legacy Strapi blocks (__component) and Sanity blocks (_type).
+ * Uses stegaClean for type comparisons to handle visual editing metadata.
+ * Preserves _id, _type, _key on blocks for visual editing compatibility.
+ *
+ * @param blocks - Array of block objects from Strapi or Sanity
  * @param pageContext - Current page context for variant selection
  * @returns Array of React elements or null
  *
@@ -132,10 +175,15 @@ export function renderLayoutBlocks({
 
   return blocks.map((block, index) => {
     try {
-      const componentType = block.__component;
+      // Prefer Sanity _type, fall back to legacy __component
+      const rawType = block._type ?? block.__component;
+
+      // Use stegaClean only for type comparison (not rendered text)
+      const componentType =
+        typeof rawType === "string" ? stegaClean(rawType) : undefined;
 
       // Check if component type is registered
-      if (!(componentType in BLOCK_COMPONENTS)) {
+      if (!componentType || !(componentType in BLOCK_COMPONENTS)) {
         console.warn(
           `[Layout Block Renderer] Unknown block component type: ${componentType}`
         );
@@ -146,14 +194,22 @@ export function renderLayoutBlocks({
         componentType as keyof BlockComponentMap
       ] as BlockComponentType;
 
-      // Generate stable key using component type and ID
-      const key = `${block.__component}-${block.id}`;
+      // Use _key when available (Sanity), otherwise stable fallback
+      const key = block._key ?? `${componentType}-${block.id ?? index}`;
 
       // Special handling for info-section to pass context
-      if (componentType === "layout.info-section") {
+      if (
+        componentType === "layout.info-section" ||
+        componentType === "infoBlock"
+      ) {
         return (
           <React.Fragment key={key}>
-            {(Component as (props: { data: IInfoSectionProps }, context: PageContext) => JSX.Element | null)(
+            {(
+              Component as (
+                props: { data: IInfoSectionProps },
+                context: PageContext
+              ) => JSX.Element | null
+            )(
               { data: block as IInfoSectionProps },
               pageContext
             )}
@@ -162,13 +218,19 @@ export function renderLayoutBlocks({
       }
 
       // Handle hero-section
-      if (componentType === "layout.hero-section") {
+      if (
+        componentType === "layout.hero-section" ||
+        componentType === "heroBlock"
+      ) {
         const HeroComponent = Component as typeof HeroSection;
         return <HeroComponent key={key} data={block as IHeroSectionProps} />;
       }
 
       // Handle gallery-section
-      if (componentType === "layout.gallery-section") {
+      if (
+        componentType === "layout.gallery-section" ||
+        componentType === "galleryBlock"
+      ) {
         const GalleryComponent = Component as typeof GallerySection;
         return (
           <GalleryComponent key={key} data={block as IGallerySectionProps} />
@@ -176,7 +238,10 @@ export function renderLayoutBlocks({
       }
 
       // Handle location-section
-      if (componentType === "layout.location-section") {
+      if (
+        componentType === "layout.location-section" ||
+        componentType === "locationBlock"
+      ) {
         const LocationComponent = Component as typeof LocationSection;
         return (
           <LocationComponent key={key} data={block as ILocationSectionProps} />
@@ -184,7 +249,10 @@ export function renderLayoutBlocks({
       }
 
       // Handle deals-section
-      if (componentType === "layout.deals-section") {
+      if (
+        componentType === "layout.deals-section" ||
+        componentType === "dealsBlock"
+      ) {
         const DealsComponent = Component as typeof DealsSection;
         return (
           <DealsComponent key={key} data={block as IDealsSectionProps} />
@@ -192,7 +260,10 @@ export function renderLayoutBlocks({
       }
 
       // Handle reviews-section
-      if (componentType === "layout.reviews-section") {
+      if (
+        componentType === "layout.reviews-section" ||
+        componentType === "reviewsBlock"
+      ) {
         const ReviewsComponent = Component as typeof ReviewsSection;
         return (
           <ReviewsComponent key={key} data={block as IReviewsSectionProps} />
@@ -200,7 +271,10 @@ export function renderLayoutBlocks({
       }
 
       // Handle standfirst-section
-      if (componentType === "layout.standfirst-section") {
+      if (
+        componentType === "layout.standfirst-section" ||
+        componentType === "standfirstBlock"
+      ) {
         const StandfirstComponent = Component as typeof StandfirstSection;
         return (
           <StandfirstComponent key={key} data={block as IStandfirstSectionProps} />

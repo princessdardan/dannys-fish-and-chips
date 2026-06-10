@@ -6,10 +6,12 @@ import { Header } from "@/components/custom/layout/header";
 import { Footer } from "@/components/custom/layout/footer";
 import { JsonLd } from "@/components/seo/json-ld";
 import { generateRestaurantSchema } from "@/lib/structured-data";
-import { validateApiResponse } from "@/lib/error-handler";
-import { unstable_cache } from "next/cache";
-import type { TGlobal, TMainMenu, TAnnouncement, THoursAndLocation, ILocationSectionProps } from "@/types";
+
+import { draftMode } from "next/headers";
+import type { TGlobal, TMainMenu, THoursAndLocation, ILocationSectionProps } from "@/types";
 import { Analytics } from "@vercel/analytics/next"
+import { SanityLiveWrapper } from "@/components/sanity/sanity-live";
+import { VisualEditingWrapper } from "@/components/sanity/visual-editing";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,46 +58,6 @@ const DEFAULT_MENU_DATA: TMainMenu = {
   MainMenuItems: []
 };
 
-// Cache global data for 1 hour (header, footer, social links)
-const getGlobalDataCached = unstable_cache(
-  async () => {
-    const globalDataResponse = await loaders.getGlobalData();
-    return validateApiResponse(globalDataResponse, "global page");
-  },
-  ['global-data'],
-  { revalidate: 3600, tags: ['global'] }
-);
-
-// Cache main menu data for 5 minutes (navigation items)
-const getMainMenuDataCached = unstable_cache(
-  async () => {
-    const mainMenuDataResponse = await loaders.getMainMenuData();
-    return validateApiResponse(mainMenuDataResponse, "main menu");
-  },
-  ['main-menu-data'],
-  { revalidate: 300, tags: ['menu'] }
-);
-
-// Cache announcement data for 5 minutes (allows quick updates)
-const getAnnouncementDataCached = unstable_cache(
-  async (): Promise<TAnnouncement | null> => {
-    return loaders.getAnnouncementData();
-  },
-  ['announcement-data'],
-  { revalidate: 300, tags: ['announcement'] }
-);
-
-// Cache hours and location data for JSON-LD schema (1 hour)
-const getHoursAndLocationDataCached = unstable_cache(
-  async (): Promise<THoursAndLocation | null> => {
-    const response = await loaders.getHoursAndLocationData();
-    if (!response.success || !response.data) return null;
-    return response.data;
-  },
-  ['hours-location-data'],
-  { revalidate: 3600, tags: ['hours-location'] }
-);
-
 /**
  * Extracts location section from hours and location page blocks.
  */
@@ -114,13 +76,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dannysfishandchips
  * Build site-wide metadata from Strapi with safe fallbacks.
  *
  * Data flow: requests global metadata and maps it to Next.js Metadata.
+ * getMetaData() already forces stega: false internally so SEO fields are clean.
  * Side effects: network I/O via loaders.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = await loaders.getMetaData();
 
-  const title = metadata?.data?.title ?? "Danny’s Fish & Chips | Barrie, ON | Since 1975";
-  const description = metadata?.data?.description ?? "A Barrie favourite, Danny’s Fish & Chips has served crispy battered fish and golden chips across Ontario since 1975—family-owned and made fresh.";
+  const title = metadata?.data?.title ?? "Danny's Fish & Chips | Barrie, ON | Since 1975";
+  const description = metadata?.data?.description ?? "A Barrie favourite, Danny's Fish & Chips has served crispy battered fish and golden chips across Ontario since 1975—family-owned and made fresh.";
 
   return {
     title,
@@ -130,7 +93,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       type: "website",
       locale: "en_CA",
-      siteName: "Danny’s Fish & Chips",
+      siteName: "Danny's Fish & Chips",
       url: SITE_URL,
     },
     twitter: {
@@ -145,7 +108,9 @@ export async function generateMetadata(): Promise<Metadata> {
  * Root shell for the public site pages.
  *
  * Layout: renders header + main + footer and includes Vercel Analytics.
- * Data flow: loads global header/footer + menu data with cached loaders.
+ * Data flow: loads global header/footer + menu data via loaders.
+ * Public reads rely on sanityFetch cache/sync tags (wired to <SanityLive />).
+ * Draft reads bypass cache and use serverClient.fetch directly.
  * Side effects: server fetches + console logging on fetch failures.
  */
 export default async function RootLayout({
@@ -153,27 +118,41 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const draft = await draftMode();
+  const draftOpts = draft.isEnabled ? { draftMode: true } : undefined;
 
-  // Fetch data with fallbacks to prevent layout crashes
-  const globalData = await getGlobalDataCached().catch(err => {
-    console.error('[Layout] Failed to load global data:', err);
-    return DEFAULT_GLOBAL_DATA;
-  });
+  // Fetch data with fallbacks to prevent layout crashes.
+  // Public reads go through sanityFetch (sync tags wired to <SanityLive />).
+  // Draft reads bypass cache via serverClient.fetch directly.
+  const globalData = await loaders.getGlobalData(draftOpts)
+    .then(r => (r.success && r.data ? r.data : DEFAULT_GLOBAL_DATA))
+    .catch(err => {
+      console.error('[Layout] Failed to load global data:', err);
+      return DEFAULT_GLOBAL_DATA;
+    });
 
-  const mainMenuData = await getMainMenuDataCached().catch(err => {
-    console.error('[Layout] Failed to load menu data:', err);
-    return DEFAULT_MENU_DATA;
-  });
+  const mainMenuData = await loaders.getMainMenuData(draftOpts)
+    .then(r => (r.success && r.data ? r.data : DEFAULT_MENU_DATA))
+    .catch(err => {
+      console.error('[Layout] Failed to load menu data:', err);
+      return DEFAULT_MENU_DATA;
+    });
 
-  const announcementData = await getAnnouncementDataCached().catch(err => {
-    console.error('[Layout] Failed to load announcement data:', err);
-    return null;
-  });
+  const announcementData = await loaders.getAnnouncementData(draftOpts)
+    .catch(err => {
+      console.error('[Layout] Failed to load announcement data:', err);
+      return null;
+    });
 
-  const hoursLocationData = await getHoursAndLocationDataCached().catch(err => {
-    console.error('[Layout] Failed to load hours/location data:', err);
-    return null;
-  });
+  const hoursLocationData = await loaders.getHoursAndLocationData(draftOpts)
+    .then(r => {
+      if (!r.success || !r.data) return null;
+      return r.data;
+    })
+    .catch(err => {
+      console.error('[Layout] Failed to load hours/location data:', err);
+      return null;
+    });
 
   // Generate restaurant schema for JSON-LD
   const locationData = extractLocationData(hoursLocationData);
@@ -199,6 +178,8 @@ export default async function RootLayout({
           <Footer data={globalData?.footer} />
         </div>
         <Analytics />
+        <SanityLiveWrapper />
+        <VisualEditingWrapper />
       </body>
     </html>
   );

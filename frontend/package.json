@@ -13,13 +13,18 @@
     "test:e2e:ui": "bash scripts/setup-test-env.sh && playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
-    "playwright:install": "playwright install --with-deps"
+    "playwright:install": "playwright install --with-deps",
+    "sanity:typegen": "sanity schema extract --path ./schema.json && sanity typegen generate"
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^13.8.0",
+    "@portabletext/react": "^6.2.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@radix-ui/react-slot": "^1.2.4",
+    "@sanity/icons": "^3.7.4",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "4.22.0",
     "@types/qs": "^6.14.0",
     "@vercel/analytics": "^1.6.1",
     "as": "^0.4.1",
@@ -28,10 +33,16 @@
     "lucide-react": "^0.561.0",
     "motion-plus": "file:.cache/motion-plus-2.0.2.tgz",
     "next": "^16.1.6",
+    "next-sanity": "11.6.13",
     "qs": "^6.14.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "tailwind-merge": "^3.4.0"
+    "resend": "^6.12.4",
+    "sanity": "4.22.0",
+    "server-only": "^0.0.1",
+    "styled-components": "^6.4.2",
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
@@ -40,6 +51,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "babel-plugin-react-compiler": "1.0.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",

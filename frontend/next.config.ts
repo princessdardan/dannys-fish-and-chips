@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+const sanityProjectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const sanityDataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
+
 /**
  * Next.js configuration for the frontend app.
  *
@@ -23,6 +26,15 @@ const nextConfig: NextConfig = {
         hostname: "ddbwmyxekofmhitwyxoy.supabase.co",
         pathname: "/storage/v1/object/public/**/*",
       },
+      ...(sanityProjectId
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: "cdn.sanity.io",
+              pathname: `/images/${sanityProjectId}/${sanityDataset}/**`,
+            },
+          ]
+        : []),
     ],
   },
 };

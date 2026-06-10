@@ -14,30 +14,52 @@ test.describe("Magazine Gallery", () => {
     });
 
     test("should navigate to next spread with right arrow key", async ({ page }) => {
+      const gallery = page.locator(".magazine-container").first();
       const pageIndicator = page.locator(".magazine-page-indicator");
       const initialText = await pageIndicator.textContent();
 
+      // Focus the gallery to ensure keyboard events are captured
+      await gallery.click();
       await page.keyboard.press("ArrowRight");
-      await page.waitForTimeout(500); // Wait for animation (increased for Firefox)
 
-      const newText = await pageIndicator.textContent();
-      // Should have advanced (unless already on last spread)
-      expect(newText).not.toBe(initialText);
+      // Wait for the page indicator to actually change
+      await expect
+        .poll(async () => pageIndicator.textContent(), {
+          message: "Expected page indicator to change after pressing ArrowRight",
+        })
+        .not.toBe(initialText);
     });
 
     test("should navigate to previous spread with left arrow key", async ({ page }) => {
-      // First go to second spread
-      await page.keyboard.press("ArrowRight");
-      await page.waitForTimeout(600); // Increased for Firefox
-
+      const gallery = page.locator(".magazine-container").first();
       const pageIndicator = page.locator(".magazine-page-indicator");
+      const initialText = await pageIndicator.textContent();
+
+      // Focus the gallery to ensure keyboard events are captured
+      await gallery.click();
+
+      // Navigate forward first and wait for the page to actually change
+      await page.keyboard.press("ArrowRight");
+      await expect
+        .poll(async () => pageIndicator.textContent(), {
+          message: "Expected page indicator to change after pressing ArrowRight",
+        })
+        .not.toBe(initialText);
+
       const afterNextText = await pageIndicator.textContent();
 
+      // Now navigate back and wait for the page to actually change
       await page.keyboard.press("ArrowLeft");
-      await page.waitForTimeout(600); // Increased for Firefox
+      await expect
+        .poll(async () => pageIndicator.textContent(), {
+          message: "Expected page indicator to change after pressing ArrowLeft",
+        })
+        .not.toBe(afterNextText);
 
       const afterPrevText = await pageIndicator.textContent();
-      expect(afterPrevText).not.toBe(afterNextText);
+
+      // Should be back at the initial spread
+      expect(afterPrevText).toBe(initialText);
     });
 
     test("should navigate with Turn page button", async ({ page }) => {

@@ -3,15 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { api } from "@/data/data-api";
-import { getStrapiURL } from "@/lib/utils";
-import type {
-  TContactSubmission,
-  TContactSubmissionPayload,
-  TContactFormState,
-} from "@/types";
+import type { TContactFormState } from "@/types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type FormApiResponse =
+  | { ok: true; message: string }
+  | { ok: false; message: string; errors?: unknown };
 
 interface IContactFormProps {
   heading?: string;
@@ -23,11 +21,11 @@ interface IContactFormProps {
 }
 
 /**
- * Contact form with validation and Strapi submission.
+ * Contact form with validation and server-side email submission.
  *
- * Data flow: collects name, email, subject, message, posts to `/api/contact-submissions`,
+ * Data flow: collects name, email, subject, message, posts to `/api/contact`,
  * and renders success/error states.
- * Side effects: network POST to Strapi and local component state updates.
+ * Side effects: network POST to Next.js API route and local component state updates.
  */
 export function ContactForm({
   heading = "Get in Touch",
@@ -41,6 +39,7 @@ export function ContactForm({
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [website, setWebsite] = useState("");
   const [formState, setFormState] = useState<TContactFormState>({
     status: "idle",
     message: "",
@@ -83,33 +82,6 @@ export function ContactForm({
     return { valid: true, message: "" };
   }
 
-  function handleStrapiError(
-    error:
-      | {
-          status: number;
-          name: string;
-          message: string;
-          details?: Record<string, string[]>;
-        }
-      | undefined
-  ): string {
-    if (!error) return "An unexpected error occurred.";
-
-    if (error.details?.email) {
-      return "Please enter a valid email address.";
-    }
-
-    if (error.details?.name) {
-      return "Please enter your name.";
-    }
-
-    if (error.details?.message) {
-      return "Please enter a message.";
-    }
-
-    return error.message || "An error occurred. Please try again.";
-  }
-
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -122,32 +94,34 @@ export function ContactForm({
     setFormState({ status: "loading", message: "" });
 
     try {
-      const url = getStrapiURL("/api/contact-submissions");
-      const payload: TContactSubmissionPayload = {
-        data: {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           name: name.trim(),
           email: email.trim().toLowerCase(),
           subject: subject.trim() || undefined,
           message: message.trim(),
-          submittedAt: new Date().toISOString(),
           source,
-        },
-      };
+          website,
+        }),
+      });
+      const result = (await response.json()) as FormApiResponse;
 
-      const response = await api.post<
-        TContactSubmission,
-        TContactSubmissionPayload
-      >(url, payload);
-
-      if (response.success) {
-        setFormState({ status: "success", message: successMessage });
+      if (response.ok && result.ok) {
+        setFormState({
+          status: "success",
+          message: successMessage || result.message,
+        });
         setName("");
         setEmail("");
         setSubject("");
         setMessage("");
+        setWebsite("");
       } else {
-        const errorMessage = handleStrapiError(response.error);
-        setFormState({ status: "error", message: errorMessage });
+        setFormState({ status: "error", message: result.message });
       }
     } catch {
       setFormState({
@@ -178,6 +152,18 @@ export function ContactForm({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="sr-only" aria-hidden="true">
+            <label htmlFor="contact-website">Website</label>
+            <input
+              id="contact-website"
+              type="text"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label

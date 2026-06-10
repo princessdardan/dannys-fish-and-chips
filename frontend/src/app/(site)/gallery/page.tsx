@@ -1,6 +1,7 @@
 import { loaders } from "@/data/loaders";
 import { validateApiResponse } from "@/lib/error-handler";
 import { renderLayoutBlocks } from "@/components/ui/layout-block-renderer";
+import { draftMode } from "next/headers";
 
 export const revalidate = 1800;
 
@@ -11,7 +12,8 @@ export const revalidate = 1800;
  * to accommodate the fixed header.
  */
 export default async function GalleryPage() {
-  const galleryData = await loaders.getGalleryData();
+  const draft = await draftMode();
+  const galleryData = await loaders.getGalleryData(draft.isEnabled ? { draftMode: true } : undefined);
   const data = validateApiResponse(galleryData, "gallery");
 
   return (
