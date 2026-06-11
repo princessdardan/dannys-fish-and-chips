@@ -1,6 +1,6 @@
 import { Tag, Check } from "lucide-react";
 import type { IDealsSectionProps, TSpecialDeal } from "@/types";
-import { StrapiImage } from "@/components/ui/strapi-image";
+import { CmsImage } from "@/components/ui/cms-image";
 
 function DealCard({ deal }: { deal: TSpecialDeal }) {
   const { name, description, originalPrice, dealPrice, image, itemsIncluded } = deal;
@@ -11,7 +11,7 @@ function DealCard({ deal }: { deal: TSpecialDeal }) {
     <div className="bg-background border-t-4 border-b border-x border-brand-black/30 border-t-brand-red overflow-hidden">
       {image && (
         <div className="relative h-48 bg-background">
-          <StrapiImage
+          <CmsImage
             src={image.url}
             alt={image.alternativeText || name}
             fill

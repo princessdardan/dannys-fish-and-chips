@@ -2,8 +2,8 @@ import React from "react";
 import Image from "next/image";
 import { CircleSmall } from "lucide-react";
 import { BlocksContent, InlineNode } from "@/types";
-import { getStrapiMedia } from "@/components/ui/strapi-image";
-import { getStrapiVideo } from "@/components/ui/strapi-video";
+import { getMediaUrl } from "@/components/ui/cms-image";
+import { getVideoUrl } from "@/components/ui/cms-video";
 
 interface BlockRendererProps {
   content: BlocksContent;
@@ -59,7 +59,7 @@ const renderInlineNodes = (nodes: InlineNode[]): React.ReactNode => {
 };
 
 /**
- * Render Strapi rich text blocks into HTML.
+ * Render CMS rich text blocks into HTML.
  *
  * Data flow: maps BlocksContent to semantic elements and renders inline nodes.
  */
@@ -127,7 +127,7 @@ export function BlockRenderer({ content }: BlockRendererProps) {
             );
 
           case "image": {
-            const imageUrl = getStrapiMedia(block.image.url);
+            const imageUrl = getMediaUrl(block.image.url);
             if (!imageUrl) return null;
 
             return (
@@ -149,7 +149,7 @@ export function BlockRenderer({ content }: BlockRendererProps) {
           }
 
           case "video": {
-            const videoUrl = getStrapiVideo(block.video.url);
+            const videoUrl = getVideoUrl(block.video.url);
             if (!videoUrl) return null;
 
             return (

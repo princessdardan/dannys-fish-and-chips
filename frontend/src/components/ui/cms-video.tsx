@@ -1,6 +1,4 @@
-import { getStrapiURL } from "@/lib/utils";
-
-interface IStrapiVideoProps {
+interface ICmsVideoProps {
   src: string;
   caption?: string | null;
   alt?: string | null;
@@ -16,22 +14,19 @@ interface IStrapiVideoProps {
 }
 
 /**
- * Normalize a Strapi video URL to an absolute URL.
+ * Normalize a video URL. Absolute URLs (e.g. CDN) are returned as-is.
  */
-export function getStrapiVideo(url: string | null) {
-  const strapiURL = getStrapiURL();
-  if (url == null) return null;
-  if (url.startsWith("data:")) return url;
-  if (url.startsWith("http") || url.startsWith("//")) return url;
-  return `${strapiURL}${url}`;
+export function getVideoUrl(url: string | null) {
+  if (!url) return null;
+  return url;
 }
 
 /**
- * HTML video wrapper that resolves Strapi media URLs.
+ * HTML video wrapper that resolves CMS media URLs.
  *
- * Data flow: converts the `src` (and optional poster) to absolute URLs.
+ * Data flow: converts the `src` (and optional poster) to usable URLs.
  */
-export function StrapiVideo({
+export function CmsVideo({
   src,
   className,
   controls = true,
@@ -42,11 +37,11 @@ export function StrapiVideo({
   preload = "metadata",
   width,
   height,
-}: Readonly<IStrapiVideoProps>) {
-  const videoUrl = getStrapiVideo(src);
+}: Readonly<ICmsVideoProps>) {
+  const videoUrl = getVideoUrl(src);
   if (!videoUrl) return null;
 
-  const posterUrl = poster ? getStrapiVideo(poster) : undefined;
+  const posterUrl = poster ? getVideoUrl(poster) : undefined;
 
   return (
     <video

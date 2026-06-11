@@ -9,7 +9,7 @@ export const revalidate = 1800;
 /**
  * Home page entry point.
  *
- * Data flow: loads home page blocks from Strapi and renders them via the
+ * Data flow: loads home page blocks and renders them via the
  * layout block registry. Conditionally embeds announcement page blocks
  * when the announcement is active and showOnHomepage is enabled.
  * Public reads rely on sanityFetch cache/sync tags (wired to <SanityLive />).

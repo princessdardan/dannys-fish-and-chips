@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import type { TStrapiResponse } from "@/types";
+import type { TApiResponse } from "@/types";
 
 /**
  * Handles API response errors consistently across all routes
@@ -10,7 +10,7 @@ import type { TStrapiResponse } from "@/types";
  * @returns void - Function either succeeds silently or throws/redirects
  */
 export function handleApiError<T>(
-  data: TStrapiResponse<T> | null | undefined,
+  data: TApiResponse<T> | null | undefined,
   resourceName?: string
 ): void {
   if (!data) {
@@ -39,7 +39,7 @@ export function handleApiError<T>(
  * @throws Error when the response indicates failure
  */
 export function validateApiResponse<T>(
-  data: TStrapiResponse<T> | null | undefined,
+  data: TApiResponse<T> | null | undefined,
   resourceName?: string
 ): T {
   handleApiError(data, resourceName);

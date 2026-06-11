@@ -8,7 +8,7 @@ export const revalidate = 1800;
 /**
  * Hours and Location page.
  *
- * Data flow: loads Strapi blocks and renders them via the shared block renderer.
+ * Data flow: loads page blocks and renders them via the shared block renderer.
  */
 export default async function HoursAndLocationPage() {
   const draft = await draftMode();

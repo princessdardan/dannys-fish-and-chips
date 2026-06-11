@@ -8,7 +8,7 @@ const baseURL = process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000';
 /**
  * Playwright test configuration for local dev and CI.
  *
- * Side effects: optionally starts backend/frontend servers when not in CI.
+ * Side effects: optionally starts frontend dev server when not in CI.
  */
 export default defineConfig({
   testDir: './e2e',
@@ -41,14 +41,7 @@ export default defineConfig({
   ],
 
   webServer: process.env.CI ? undefined : [
-    // Start backend first
-    {
-      command: 'cd ../backend && npm run develop',
-      url: 'http://localhost:1337/_health',
-      timeout: 120 * 1000, // 2 min for backend startup
-      reuseExistingServer: !process.env.CI,
-    },
-    // Then start frontend
+    // Start frontend only
     {
       command: 'npm run dev',
       url: 'http://localhost:3000',

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BlockRenderer } from "@/components/ui/block-renderer";
-import { StrapiImage } from "@/components/ui/strapi-image";
-import { StrapiVideo } from "@/components/ui/strapi-video";
+import { CmsImage } from "@/components/ui/cms-image";
+import { CmsVideo } from "@/components/ui/cms-video";
 import { cn } from "@/lib/utils";
 import { BlocksContent, TMedia, TLink } from "@/types";
 
@@ -27,7 +27,7 @@ export interface IInfoSectionProps {
 /**
  * Newspaper-styled feature article with orientation support.
  *
- * Data flow: renders Strapi BlocksContent alongside image/video media.
+ * Data flow: renders CMS BlocksContent alongside image/video media.
  */
 export function InfoWithMedia({ data, index }: { data: IInfoWithMedia; index: number }) {
     if (!data) return null;
@@ -75,7 +75,7 @@ export function InfoWithMedia({ data, index }: { data: IInfoWithMedia; index: nu
                             isTopLayout ? "aspect-video" : "aspect-4/3 md:aspect-auto md:flex-1"
                         )}>
                             {isVideo && (
-                                <StrapiVideo
+                                <CmsVideo
                                     src={media.url}
                                     className="absolute inset-0 object-cover w-full h-full"
                                     autoPlay={true}
@@ -85,7 +85,7 @@ export function InfoWithMedia({ data, index }: { data: IInfoWithMedia; index: nu
                                 />
                             )}
                             {isImage && (
-                                <StrapiImage
+                                <CmsImage
                                     alt={mediaAlt}
                                     className="absolute inset-0 object-cover w-full h-full grayscale-30 contrast-110"
                                     src={media.url}

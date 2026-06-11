@@ -12,7 +12,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dannysfishandchips
 /**
  * Food and Drink Menu page.
  *
- * Data flow: loads Strapi blocks and renders the menu layout sections.
+ * Data flow: loads page blocks and renders the menu layout sections.
  * SEO: includes Menu JSON-LD schema for rich search results.
  */
 export default async function MenuPage() {

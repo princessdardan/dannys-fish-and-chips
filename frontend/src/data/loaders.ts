@@ -11,7 +11,7 @@ import {
   announcementPageQuery,
 } from "@/sanity/lib/queries";
 import type {
-  TStrapiResponse,
+  TApiResponse,
   TGlobal,
   TMainMenu,
   TMetaData,
@@ -55,7 +55,7 @@ import {
 
 export type LoaderOptions = FetchOptions;
 
-function wrapSuccess<T>(data: T | null): TStrapiResponse<T> {
+function wrapSuccess<T>(data: T | null): TApiResponse<T> {
   if (data === null) {
     return {
       success: false,
@@ -259,24 +259,24 @@ export function mapSpecialDeal(
 // Loaders
 // =============================================================================
 
-async function getHomePageData(options?: LoaderOptions): Promise<TStrapiResponse<THomePage>> {
+async function getHomePageData(options?: LoaderOptions): Promise<TApiResponse<THomePage>> {
   const data = await fetchDocument<HomePageQueryResult>(homePageQuery, {}, options);
   return wrapSuccess(data ? mapToHomePage(data) : null);
 }
 
-async function getGlobalData(options?: LoaderOptions): Promise<TStrapiResponse<TGlobal>> {
+async function getGlobalData(options?: LoaderOptions): Promise<TApiResponse<TGlobal>> {
   const data = await fetchDocument<SiteSettingsQueryResult>(siteSettingsQuery, {}, options);
   const mapped = data ? mapSiteSettingsToGlobal(data) : null;
   return wrapSuccess(mapped);
 }
 
-async function getMainMenuData(options?: LoaderOptions): Promise<TStrapiResponse<TMainMenu>> {
+async function getMainMenuData(options?: LoaderOptions): Promise<TApiResponse<TMainMenu>> {
   const data = await fetchDocument<MainNavigationQueryResult>(mainNavigationQuery, {}, options);
   const mapped = data ? mapMainNavigationToMenu(data) : null;
   return wrapSuccess(mapped);
 }
 
-async function getMetaData(options?: LoaderOptions): Promise<TStrapiResponse<TMetaData>> {
+async function getMetaData(options?: LoaderOptions): Promise<TApiResponse<TMetaData>> {
   // Metadata fields must never include stega strings
   const data = await fetchDocument<MetadataQueryResult>(metadataQuery, {}, {
     ...options,
@@ -296,37 +296,37 @@ async function getMetaData(options?: LoaderOptions): Promise<TStrapiResponse<TMe
   return wrapSuccess(mapped);
 }
 
-async function getAboutUsData(options?: LoaderOptions): Promise<TStrapiResponse<TAboutUs>> {
+async function getAboutUsData(options?: LoaderOptions): Promise<TApiResponse<TAboutUs>> {
   const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "about-us" }, options);
   return wrapSuccess(data ? mapToAboutUs(data) : null);
 }
 
-async function getContactUsData(options?: LoaderOptions): Promise<TStrapiResponse<TContactUs>> {
+async function getContactUsData(options?: LoaderOptions): Promise<TApiResponse<TContactUs>> {
   const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "contact-us" }, options);
   return wrapSuccess(data ? mapToContactUs(data) : null);
 }
 
-async function getFoodAndDrinkMenuData(options?: LoaderOptions): Promise<TStrapiResponse<TFoodAndDrinkMenu>> {
+async function getFoodAndDrinkMenuData(options?: LoaderOptions): Promise<TApiResponse<TFoodAndDrinkMenu>> {
   const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "food-and-drink-menu" }, options);
   return wrapSuccess(data ? mapToFoodAndDrinkMenu(data) : null);
 }
 
-async function getGalleryData(options?: LoaderOptions): Promise<TStrapiResponse<TGallery>> {
+async function getGalleryData(options?: LoaderOptions): Promise<TApiResponse<TGallery>> {
   const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "gallery" }, options);
   return wrapSuccess(data ? mapToGallery(data) : null);
 }
 
-async function getHoursAndLocationData(options?: LoaderOptions): Promise<TStrapiResponse<THoursAndLocation>> {
+async function getHoursAndLocationData(options?: LoaderOptions): Promise<TApiResponse<THoursAndLocation>> {
   const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "hours-and-location" }, options);
   return wrapSuccess(data ? mapToHoursAndLocation(data) : null);
 }
 
-async function getSpecialData(options?: LoaderOptions): Promise<TStrapiResponse<TSpecial>> {
+async function getSpecialData(options?: LoaderOptions): Promise<TApiResponse<TSpecial>> {
   const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug: "special" }, options);
   return wrapSuccess(data ? mapToSpecial(data) : null);
 }
 
-async function getSpecialDealsData(options?: LoaderOptions): Promise<TStrapiResponse<TSpecialDeal[]>> {
+async function getSpecialDealsData(options?: LoaderOptions): Promise<TApiResponse<TSpecialDeal[]>> {
   const data = await fetchDocuments<SpecialDealsQueryResult[number]>(specialDealsQuery, {}, options);
   const mapped = data.map(mapSpecialDeal);
   return wrapSuccess(mapped);
@@ -341,7 +341,7 @@ async function getAnnouncementData(options?: LoaderOptions): Promise<TAnnounceme
   return data ? mapAnnouncementBar(data) : null;
 }
 
-async function getAnnouncementPageData(options?: LoaderOptions): Promise<TStrapiResponse<TAnnouncementPage> | null> {
+async function getAnnouncementPageData(options?: LoaderOptions): Promise<TApiResponse<TAnnouncementPage> | null> {
   const data = await fetchDocument<AnnouncementPageQueryResult>(announcementPageQuery, {}, options);
   const mapped = data ? mapToAnnouncementPage(data) : null;
   if (!mapped) return null;

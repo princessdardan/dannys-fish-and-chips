@@ -8,7 +8,7 @@ export const revalidate = 1800;
 /**
  * Gallery page.
  *
- * Data flow: loads gallery blocks from Strapi and renders them with spacing
+ * Data flow: loads gallery blocks from Sanity and renders them with spacing
  * to accommodate the fixed header.
  */
 export default async function GalleryPage() {

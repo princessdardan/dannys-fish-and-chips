@@ -6,7 +6,7 @@ import { ILocationSectionProps, IOperatingHours } from "@/components/custom/layo
 export type { IHeroSectionProps, IInfoSectionProps, ILocationSectionProps, IOperatingHours };
 
 
-// Strapi Block Rich Text Types
+// Block Rich Text Types
 export type BlocksContent = Array<
   | ParagraphBlock
   | HeadingBlock
@@ -345,7 +345,7 @@ export type LayoutBlock =
   | IReviewsSectionProps
   | IStandfirstSectionProps;
 
-export type TStrapiResponse<T = null> = {
+export type TApiResponse<T = null> = {
   success: boolean;
   data?: T;
   error?: {

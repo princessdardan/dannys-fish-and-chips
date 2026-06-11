@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { StrapiImage } from "@/components/ui/strapi-image";
-import { StrapiVideo } from "@/components/ui/strapi-video";
+import { CmsImage } from "@/components/ui/cms-image";
+import { CmsVideo } from "@/components/ui/cms-video";
 import { cn } from "@/lib/utils";
 import type { IStandfirstSectionProps } from "@/types";
 
@@ -61,7 +61,7 @@ export function StandfirstSection({ data }: { data: IStandfirstSectionProps }) {
               <figure className="relative">
                 <div className="relative aspect-4/3 border-2 border-brand-black/30 overflow-hidden bg-gray-100">
                   {isVideo && (
-                    <StrapiVideo
+                    <CmsVideo
                       src={media.url}
                       className="absolute inset-0 object-cover w-full h-full"
                       autoPlay={true}
@@ -71,7 +71,7 @@ export function StandfirstSection({ data }: { data: IStandfirstSectionProps }) {
                     />
                   )}
                   {isImage && (
-                    <StrapiImage
+                    <CmsImage
                       alt={mediaAlt}
                       className="absolute inset-0 object-cover w-full h-full grayscale-[0.3] contrast-[1.1]"
                       src={media.url}
@@ -180,7 +180,7 @@ function CompactStandfirst({ data }: { data: IStandfirstSectionProps }) {
           {media && (
             <div className="relative aspect-square overflow-hidden border border-brand-black/20">
               {isVideo && (
-                <StrapiVideo
+                <CmsVideo
                   src={media.url}
                   className="absolute inset-0 object-cover w-full h-full"
                   autoPlay={true}
@@ -190,7 +190,7 @@ function CompactStandfirst({ data }: { data: IStandfirstSectionProps }) {
                 />
               )}
               {isImage && (
-                <StrapiImage
+                <CmsImage
                   alt={mediaAlt}
                   className="absolute inset-0 object-cover w-full h-full"
                   src={media.url}

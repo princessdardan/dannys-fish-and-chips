@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Agent Operating Rules
 
-Scope: Next.js (TypeScript) frontend, Strapi backend, Vercel + Railway.
+Scope: Next.js (TypeScript) frontend, Sanity CMS, inert Strapi archive, Vercel.
 Goal: Keep agents aligned, predictable, and low-overhead.
 
 ## 1. Authority & Scope
@@ -35,7 +35,7 @@ Risks — failure modes + mitigation
 ## 4. Contracts Over Convenience
 
 All boundaries are explicit:
-- Frontend ↔ Strapi API
+- Frontend ↔ Sanity API
 - Server ↔ client components
 - Build ↔ runtime configuration
 
@@ -45,7 +45,7 @@ No ad-hoc fetches or inline magic strings for endpoints or env vars.
 ## 5. Type Safety (Hard Rule)
 
 - No `any`, no unchecked external data
-- External inputs (Strapi responses, webhooks, env vars) validated at boundary
+- External inputs (Sanity responses/webhooks/env vars) validated at boundary
 - App-internal code may assume validated types
 
 ## 6. Determinism & Reversibility
