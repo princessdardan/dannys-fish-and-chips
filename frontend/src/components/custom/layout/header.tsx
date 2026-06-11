@@ -141,7 +141,7 @@ function HeaderContent({ data, menuItems }: IHeaderProps) {
  * Design: Classic broadsheet newspaper aesthetic with centered masthead,
  * thin rule dividers, and editorial typography.
  *
- * Data flow: consumes global header data and main menu items from Strapi.
+ * Data flow: consumes global header data and main menu items.
  * Layout: responsive navigation (mobile sheet + desktop menu).
  */
 export function Header({ data, menuItems, announcement }: IHeaderProps) {

@@ -6,7 +6,7 @@ import { MagazineGallery } from "./magazine-gallery";
 /**
  * Magazine-style gallery section.
  *
- * Data flow: consumes Strapi image list and renders a vintage broadsheet-style
+ * Data flow: consumes image list and renders a vintage broadsheet-style
  * magazine with page-turning navigation.
  */
 export function GallerySection({ data }: { data: IGallerySectionProps }) {

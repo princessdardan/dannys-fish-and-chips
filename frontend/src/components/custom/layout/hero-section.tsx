@@ -1,7 +1,7 @@
 import { TMedia, TLink } from "@/types";
 import Link from "next/link";
-import { StrapiImage } from "@/components/ui/strapi-image";
-import { StrapiVideo } from "@/components/ui/strapi-video";
+import { CmsImage } from "@/components/ui/cms-image";
+import { CmsVideo } from "@/components/ui/cms-video";
 import { Button } from "@/components/ui/button";
 
 
@@ -20,7 +20,7 @@ export interface IHeroSectionProps {
 /**
  * Hero section with optional image/video background and CTA links.
  *
- * Data flow: receives Strapi media + link data and renders a layout variant
+ * Data flow: receives CMS media + link data and renders a layout variant
  * based on the `onHomepage` flag.
  */
 export function HeroSection({ data }: { data: IHeroSectionProps }) {
@@ -38,7 +38,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
     return (
       <section className="relative h-[60vh] md:h-[70vh]">
         {isVideo && media && (
-          <StrapiVideo
+          <CmsVideo
             src={media.url}
             className="absolute inset-0 object-cover w-full h-full"
             autoPlay={true}
@@ -48,7 +48,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
           />
         )}
         {isImage && media && (
-          <StrapiImage
+          <CmsImage
             alt={mediaAlt}
             className="absolute inset-0 object-cover w-full h-full"
             src={media.url}
@@ -96,7 +96,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
   return (
     <section className="relative h-dvh overflow-hidden">
       {isVideo && media && (
-        <StrapiVideo
+        <CmsVideo
           src={media.url}
           className="absolute inset-0 object-cover w-full h-full"
           autoPlay={true}
@@ -106,7 +106,7 @@ export function HeroSection({ data }: { data: IHeroSectionProps }) {
         />
       )}
       {isImage && media && (
-        <StrapiImage
+        <CmsImage
           alt={mediaAlt}
           className="absolute inset-0 object-cover w-full h-full"
           src={media.url}

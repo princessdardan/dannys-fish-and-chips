@@ -89,6 +89,11 @@ RAILWAY_ENV_SETUP.md
 VIDEO-OPTIMIZATION-GUIDE.md
 *.md
 !docs/sanity-cutover/*.md
+!backend/ARCHIVE.md
+!docs/superpowers/specs/2026-06-11-strapi-repo-decommission-design.md
+!docs/superpowers/plans/2026-06-11-strapi-repo-decommission-implementation-plan.md
+!AGENTS.md
+!CLAUDE.md
 supabase/.temp/cli-latest
 supabase/.temp/gotrue-version
 supabase/.temp/pooler-url

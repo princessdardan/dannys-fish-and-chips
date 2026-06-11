@@ -1,195 +1,73 @@
-# Deployment Guide - Vercel
+# Deployment Guide - Vercel and Sanity
 
-> **Legacy Guidance — Retained for Rollback / Reference Only**
->
-> This document describes the original Strapi-era deployment path. For the current Sanity production cutover and deployment procedure, follow [docs/sanity-cutover/CUTOVER_CHECKLIST.md](./docs/sanity-cutover/CUTOVER_CHECKLIST.md) instead. Keep this file available only as a rollback reference if the project ever needs to revert to the Strapi stack.
+## Overview
 
-This guide covers deploying Danny's Fish and Chips to Vercel.
+This application is a **Next.js 16** frontend deployed to **Vercel**. Content is managed via **Sanity Content Lake**. The `backend/` directory is an inert archive of a decommissioned Strapi backend and is **not built, run, or deployed**.
 
 ## Prerequisites
 
-- A GitHub account with this repository
-- A Vercel account (sign up at [vercel.com](https://vercel.com))
-- A PostgreSQL database (we recommend [Neon](https://neon.tech), [Supabase](https://supabase.com), or [Railway](https://railway.app))
+- **Vercel project** configured with root directory set to `frontend/`
+- **Node.js**: `>=20 <=24` (CI truth is Node 20)
+- **Sanity environment variables** (see table below)
+- **Resend environment variables** for production contact/newsletter forms
+- **Motion**: `MOTION_DEV_TOKEN` is required for the install step unless `frontend/.cache/motion-plus-2.0.2.tgz` already exists
 
-## Architecture
+## Build and Install Commands
 
-This project consists of two parts:
-- **Frontend**: Next.js application (deployed to Vercel)
-- **Backend**: Strapi CMS (deployed to Vercel or another Node.js hosting service)
+Vercel install command (runs preinstall hook):
 
-## Option 1: Deploy Frontend to Vercel
+```bash
+node scripts/setup-motion.mjs && npm install
+```
 
-### Step 1: Import Project
+Build command (from `frontend/` or root):
 
-1. Go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. Vercel will auto-detect the Next.js frontend
+```bash
+npm run build
+```
 
-### Step 2: Configure Project
+## Environment Variables
 
-- **Framework Preset**: Next.js
-- **Root Directory**: `frontend`
-- **Build Command**: `npm run build`
-- **Output Directory**: `.next`
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project ID |
+| `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset name (e.g., `production`) |
+| `NEXT_PUBLIC_SANITY_API_VERSION` | Sanity API version (e.g., `2024-01-01`) |
+| `SANITY_API_READ_TOKEN` | Sanity API read token for server-side fetching |
+| `RESEND_API_KEY` | Resend API key for email sending |
+| `RESEND_CONTACT_TO_EMAIL` | Destination email for contact form submissions |
+| `RESEND_FROM_EMAIL` | Sender email address for Resend emails |
+| `RESEND_AUDIENCE_ID` | Resend audience ID for newsletter subscriptions |
+| `MOTION_DEV_TOKEN` | Motion developer token (for `setup-motion.mjs` preinstall hook) |
 
-### Step 3: Environment Variables
+### Do Not Configure
 
-Add the following environment variable:
+The following are **legacy Strapi / backend variables** and must not be set:
 
-| Key | Value | Description |
-|-----|-------|-------------|
-| `NEXT_PUBLIC_STRAPI_URL` | Your Strapi backend URL | API endpoint (e.g., `https://your-strapi-backend.vercel.app`) |
+- `NEXT_PUBLIC_STRAPI_URL`
+- `STRAPI_API_TOKEN`
+- Any Railway backend deployment settings
+- Any `backend/` deployment pipeline
 
-### Step 4: Deploy
+The `backend/` directory is an inert archive. See `backend/ARCHIVE.md` for historical context.
 
-Click "Deploy" and Vercel will build and deploy your frontend.
+## Verification Steps
 
-## Option 2: Deploy Backend (Strapi) to Vercel
+Before deploying, run these checks from the `frontend/` directory:
 
-Vercel supports Node.js applications, so you can deploy Strapi there as well.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-### Step 1: Create New Project
+After deployment, smoke test:
+- Public pages load correctly
+- `/studio` (Sanity Studio) is accessible if deployed
+- Contact form and newsletter sign-up submit without errors
 
-1. Go to [vercel.com/new](https://vercel.com/new)
-2. Import the same GitHub repository
-3. Create a separate project for the backend
+## External Cleanup
 
-### Step 2: Configure Project
+For guidance on removing legacy external platform resources (S3, Supabase, etc.), see:
 
-- **Framework Preset**: Other
-- **Root Directory**: `backend`
-- **Build Command**: `npm run build`
-- **Output Directory**: Leave empty
-- **Install Command**: `npm install`
-
-### Step 3: Environment Variables
-
-Add all required Strapi environment variables:
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `HOST` | Server host | `0.0.0.0` |
-| `PORT` | Server port | `1337` |
-| `APP_KEYS` | Encryption keys (comma-separated) | Generate with `openssl rand -base64 32` |
-| `API_TOKEN_SALT` | Salt for API tokens | Generate with `openssl rand -base64 32` |
-| `ADMIN_JWT_SECRET` | Admin JWT secret | Generate with `openssl rand -base64 32` |
-| `TRANSFER_TOKEN_SALT` | Transfer token salt | Generate with `openssl rand -base64 32` |
-| `JWT_SECRET` | General JWT secret | Generate with `openssl rand -base64 32` |
-| `ENCRYPTION_KEY` | Encryption key | Generate with `openssl rand -base64 32` |
-| `DATABASE_CLIENT` | Database type | `postgres` |
-| `DATABASE_HOST` | PostgreSQL host | From your database provider |
-| `DATABASE_PORT` | PostgreSQL port | `5432` |
-| `DATABASE_NAME` | Database name | `dannys_db` |
-| `DATABASE_USERNAME` | Database user | From your database provider |
-| `DATABASE_PASSWORD` | Database password | From your database provider |
-| `DATABASE_SSL` | Use SSL for database | `true` |
-| `NODE_ENV` | Environment | `production` |
-
-### Step 4: Deploy
-
-Click "Deploy". Vercel will build and deploy your Strapi backend.
-
-### Step 5: Update Frontend Environment
-
-After backend deployment, update your frontend's `NEXT_PUBLIC_STRAPI_URL` environment variable with the backend URL.
-
-## Database Setup
-
-### Recommended: Neon (Serverless PostgreSQL)
-
-1. Sign up at [neon.tech](https://neon.tech)
-2. Create a new project
-3. Copy the connection string
-4. Parse it to get the following values:
-   - `DATABASE_HOST`
-   - `DATABASE_PORT`
-   - `DATABASE_NAME`
-   - `DATABASE_USERNAME`
-   - `DATABASE_PASSWORD`
-5. Add these to your Vercel environment variables
-
-### Alternative: Supabase
-
-1. Sign up at [supabase.com](https://supabase.com)
-2. Create a new project
-3. Go to Settings > Database
-4. Copy the connection details
-5. Add to Vercel environment variables
-
-### Alternative: Railway
-
-1. Sign up at [railway.app](https://railway.app)
-2. Create a new PostgreSQL database
-3. Copy the connection details
-4. Add to Vercel environment variables
-
-## Continuous Deployment
-
-Vercel automatically deploys when you push to your GitHub repository:
-
-- **Production**: Pushes to `main` branch
-- **Preview**: Pull requests and other branches
-
-GitHub Actions will run CI checks (linting, type checking, builds) before Vercel deploys.
-
-## Custom Domain
-
-### Configure Custom Domain on Vercel
-
-1. Go to your project settings on Vercel
-2. Navigate to "Domains"
-3. Add your custom domain
-4. Follow Vercel's DNS configuration instructions
-
-## Environment Variables Best Practices
-
-1. **Never commit secrets** to your repository
-2. **Use different values** for production and development
-3. **Rotate secrets periodically** for security
-4. **Generate strong secrets** using:
-   ```bash
-   openssl rand -base64 32
-   ```
-
-## Monitoring
-
-Vercel provides built-in monitoring:
-- View logs in the Vercel dashboard
-- Real-time function logs
-- Analytics for performance metrics
-
-## Troubleshooting
-
-### Build Fails
-
-1. Check build logs in Vercel dashboard
-2. Ensure all environment variables are set
-3. Verify Node.js version compatibility
-
-### Backend Can't Connect to Database
-
-1. Verify database credentials
-2. Check database SSL settings
-3. Ensure database accepts connections from Vercel IPs
-
-### Frontend Can't Connect to Backend
-
-1. Verify `NEXT_PUBLIC_STRAPI_URL` is correct
-2. Check CORS settings in Strapi
-3. Ensure backend is deployed and running
-
-## Alternative: Deploy Backend Elsewhere
-
-If you prefer not to deploy Strapi to Vercel, consider these alternatives:
-
-- **Railway**: [railway.app](https://railway.app) - Easy deployment with PostgreSQL
-- **Render**: [render.com](https://render.com) - Free tier available
-- **Heroku**: [heroku.com](https://heroku.com) - Established platform
-- **DigitalOcean App Platform**: Simple PaaS solution
-
-## Resources
-
-- [Vercel Documentation](https://vercel.com/docs)
-- [Next.js Deployment](https://nextjs.org/docs/deployment)
-- [Strapi Deployment](https://docs.strapi.io/dev-docs/deployment)
+[`docs/sanity-cutover/EXTERNAL_PLATFORM_CLEANUP.md`](docs/sanity-cutover/EXTERNAL_PLATFORM_CLEANUP.md)

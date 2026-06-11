@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BlockRenderer } from "@/components/ui/block-renderer";
-import { StrapiImage } from "@/components/ui/strapi-image";
-import { StrapiVideo } from "@/components/ui/strapi-video";
+import { CmsImage } from "@/components/ui/cms-image";
+import { CmsVideo } from "@/components/ui/cms-video";
 import { cn } from "@/lib/utils";
 import { IInfoSectionProps, IInfoWithMedia } from "./info-section";
 
@@ -38,7 +38,7 @@ export function NewspaperArticle({ data, index }: { data: IInfoWithMedia; index:
                     <figure className="mb-6 md:mb-0 md:h-full md:flex md:flex-col">
                         <div className="relative aspect-4/3 md:aspect-auto md:flex-1 border-2 border-brand-black/30 overflow-hidden bg-gray-100">
                             {isVideo && (
-                                <StrapiVideo
+                                <CmsVideo
                                     src={media.url}
                                     className="absolute inset-0 object-cover w-full h-full"
                                     autoPlay={true}
@@ -48,7 +48,7 @@ export function NewspaperArticle({ data, index }: { data: IInfoWithMedia; index:
                                 />
                             )}
                             {isImage && (
-                                <StrapiImage
+                                <CmsImage
                                     alt={mediaAlt}
                                     className="absolute inset-0 object-cover w-full h-full grayscale-30 contrast-110"
                                     src={media.url}

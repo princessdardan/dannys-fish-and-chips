@@ -73,7 +73,7 @@ function extractLocationData(data: THoursAndLocation | null): ILocationSectionPr
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dannysfishandchips.com";
 
 /**
- * Build site-wide metadata from Strapi with safe fallbacks.
+ * Build site-wide metadata with safe fallbacks.
  *
  * Data flow: requests global metadata and maps it to Next.js Metadata.
  * getMetaData() already forces stega: false internally so SEO fields are clean.

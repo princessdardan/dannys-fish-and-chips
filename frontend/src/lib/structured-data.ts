@@ -59,7 +59,7 @@ function formatTimeForSchema(time: string | null): string {
 /**
  * Generates Restaurant JSON-LD schema from location data.
  *
- * @param locationData - Location section data from Strapi (can be null)
+ * @param locationData - Location section data (can be null)
  * @param siteUrl - The site's base URL
  * @returns Restaurant schema object for JSON-LD
  */

@@ -19,7 +19,7 @@ interface IFooterProps {
 /**
  * Site footer with mailing list signup and social links.
  *
- * Data flow: uses footer content from Strapi global settings.
+ * Data flow: uses global footer data.
  */
 export function Footer({ data }: IFooterProps) {
   if (!data) return null;

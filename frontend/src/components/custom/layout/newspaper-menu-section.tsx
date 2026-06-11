@@ -1,6 +1,6 @@
 import { BlockRenderer } from "@/components/ui/block-renderer";
-import { StrapiImage } from "@/components/ui/strapi-image";
-import { StrapiVideo } from "@/components/ui/strapi-video";
+import { CmsImage } from "@/components/ui/cms-image";
+import { CmsVideo } from "@/components/ui/cms-video";
 import { IInfoSectionProps, IInfoWithMedia } from "./info-section";
 import { MenuColumnsWrapper } from "./menu-columns-wrapper";
 
@@ -17,7 +17,7 @@ function MenuColumn({ feature }: { feature: IInfoWithMedia }) {
         <figure className="mb-4">
           <div className="relative aspect-4/3 border-2 border-brand-black/30 overflow-hidden bg-gray-100">
             {isVideo && (
-              <StrapiVideo
+              <CmsVideo
                 src={media.url}
                 className="absolute inset-0 object-cover w-full h-full grayscale-30"
                 autoPlay={true}
@@ -27,7 +27,7 @@ function MenuColumn({ feature }: { feature: IInfoWithMedia }) {
               />
             )}
             {isImage && (
-              <StrapiImage
+              <CmsImage
                 alt={mediaAlt}
                 className="absolute inset-0 object-cover w-full h-full grayscale-30 contrast-110"
                 src={media.url}

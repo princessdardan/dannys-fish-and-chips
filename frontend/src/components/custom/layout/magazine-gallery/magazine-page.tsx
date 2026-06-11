@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { TImage } from "@/types";
-import { StrapiImage } from "@/components/ui/strapi-image";
+import { CmsImage } from "@/components/ui/cms-image";
 import { MagazineCaption } from "./magazine-caption";
 
 interface MagazinePageProps {
@@ -138,7 +138,7 @@ export function MagazinePage({
           {/* Image container */}
           <div className="flex-1 flex items-center justify-center p-4 md:p-6 overflow-hidden">
             <div className="relative w-full h-full">
-              <StrapiImage
+              <CmsImage
                 src={image.url}
                 alt={image.alternativeText || `Gallery image ${figureNumber}`}
                 fill

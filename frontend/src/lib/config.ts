@@ -6,7 +6,7 @@
 
 export const API_CONFIG = {
   timeout: {
-    development: 10000,  // 10s - slower local backend startup
+    development: 10000,  // 10s - local dev server startup
     test: 30000,         // 30s - CI environments with cold starts
     production: 5000,    // 5s - fast or fail in production
   },

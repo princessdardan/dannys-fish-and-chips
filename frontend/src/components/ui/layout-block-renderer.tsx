@@ -33,7 +33,7 @@ export type PageContext =
   | "announcement"; // → InfoSection
 
 /**
- * Extended block type that supports both legacy Strapi (__component)
+ * Extended block type that supports both legacy (__component)
  * and Sanity (_type/_key) shapes during transition.
  *
  * Preserves _id, _type, _key metadata for visual editing and debugging.
@@ -61,10 +61,10 @@ type BlockComponentType =
 
 /**
  * Registry mapping block component types to React components.
- * Supports both legacy Strapi __component names and Sanity _type names.
+ * Supports both legacy __component names and Sanity _type names.
  */
 type BlockComponentMap = {
-  // Legacy Strapi types
+  // Legacy types
   "layout.hero-section": typeof HeroSection;
   "layout.gallery-section": typeof GallerySection;
   "layout.location-section": typeof LocationSection;
@@ -109,11 +109,11 @@ function getInfoSectionComponent(context: PageContext) {
 
 /**
  * Block component registry
- * Maps both legacy Strapi __component strings and Sanity _type strings
+ * Maps both legacy __component strings and Sanity _type strings
  * to React components.
  */
 const BLOCK_COMPONENTS: BlockComponentMap = {
-  // Legacy Strapi types
+  // Legacy types
   "layout.hero-section": HeroSection,
   "layout.gallery-section": GallerySection,
   "layout.location-section": LocationSection,
@@ -148,11 +148,11 @@ interface RenderLayoutBlocksOptions {
 /**
  * Renders an array of layout blocks using the component registry.
  *
- * Supports both legacy Strapi blocks (__component) and Sanity blocks (_type).
+ * Supports both legacy blocks (__component) and Sanity blocks (_type).
  * Uses stegaClean for type comparisons to handle visual editing metadata.
  * Preserves _id, _type, _key on blocks for visual editing compatibility.
  *
- * @param blocks - Array of block objects from Strapi or Sanity
+ * @param blocks - Array of block objects from Sanity or legacy data
  * @param pageContext - Current page context for variant selection
  * @returns Array of React elements or null
  *

@@ -147,7 +147,7 @@ function mainMenuRenderer(MainMenuItem: IMainMenuItems, index: number) {
 /**
  * Render the desktop navigation menu items.
  *
- * Data flow: receives Strapi menu items and renders links/dropdowns,
+ * Data flow: receives menu items and renders links/dropdowns,
  * highlighting the active route based on `usePathname`.
  */
 export function MainMenu({ data }: { data: IMainMenuItems[]}) {

@@ -8,7 +8,7 @@ export const revalidate = 1800;
 /**
  * About Us page.
  *
- * Data flow: loads page blocks from Strapi and renders via layout block renderer.
+ * Data flow: loads page blocks from Sanity and renders via layout block renderer.
  */
 export default async function AboutUsPage() {
   const draft = await draftMode();
