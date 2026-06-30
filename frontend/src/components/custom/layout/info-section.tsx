@@ -68,11 +68,11 @@ export function InfoWithMedia({ data, index }: { data: IInfoWithMedia; index: nu
                 {media && (
                     <figure className={cn(
                         "mb-6",
-                        !isTopLayout && "md:mb-0 md:h-full md:flex md:flex-col"
+                        !isTopLayout && "md:mb-0"
                     )}>
                         <div className={cn(
                             "relative border-2 border-brand-black/30 overflow-hidden bg-gray-100",
-                            isTopLayout ? "aspect-video" : "aspect-4/3 md:aspect-auto md:flex-1"
+                            isTopLayout ? "aspect-video" : "aspect-4/3"
                         )}>
                             {isVideo && (
                                 <CmsVideo
