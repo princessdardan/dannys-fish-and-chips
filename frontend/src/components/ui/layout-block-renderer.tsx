@@ -30,7 +30,8 @@ export type PageContext =
   | "special" // → InfoSection
   | "gallery" // → (no info sections)
   | "home" // → InfoSection (if any)
-  | "announcement"; // → InfoSection
+  | "announcement" // → InfoSection
+  | (string & {}); // → dynamic generic pages default to InfoSection
 
 /**
  * Extended block type that supports both legacy (__component)

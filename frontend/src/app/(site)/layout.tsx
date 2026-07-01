@@ -175,7 +175,7 @@ export default async function RootLayout({
           <main className="grow pt-16 md:pt-50">
             {children}
           </main>
-          <Footer data={globalData?.footer} />
+          <Footer data={globalData?.footer} menuItems={mainMenuData?.MainMenuItems} />
         </div>
         <Analytics />
         <SanityLiveWrapper />

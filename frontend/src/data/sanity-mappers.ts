@@ -27,6 +27,7 @@ import type {
   THoursAndLocation,
   TSpecial,
   TAnnouncementPage,
+  TGenericPage,
 } from "@/types";
 
 import type { IInfoWithMedia } from "@/components/custom/layout/info-section";
@@ -584,6 +585,10 @@ export function mapToHoursAndLocation(result: PageBySlugQueryResult): THoursAndL
 }
 
 export function mapToSpecial(result: PageBySlugQueryResult): TSpecial | null {
+  return mapPageResultToLegacyPage(result, false);
+}
+
+export function mapToGenericPage(result: PageBySlugQueryResult): TGenericPage | null {
   return mapPageResultToLegacyPage(result, false);
 }
 

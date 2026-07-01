@@ -25,6 +25,7 @@ import type {
   TSpecialDeal,
   TAnnouncement,
   TAnnouncementPage,
+  TGenericPage,
 } from "@/types";
 import type {
   HomePageQueryResult,
@@ -46,6 +47,7 @@ import {
   mapToHoursAndLocation,
   mapToSpecial,
   mapToAnnouncementPage,
+  mapToGenericPage,
   resolveSanityImageUrl,
 } from "./sanity-mappers";
 
@@ -326,6 +328,11 @@ async function getSpecialData(options?: LoaderOptions): Promise<TApiResponse<TSp
   return wrapSuccess(data ? mapToSpecial(data) : null);
 }
 
+async function getPageDataBySlug(slug: string, options?: LoaderOptions): Promise<TApiResponse<TGenericPage>> {
+  const data = await fetchDocument<PageBySlugQueryResult>(pageBySlugQuery, { slug }, options);
+  return wrapSuccess(data ? mapToGenericPage(data) : null);
+}
+
 async function getSpecialDealsData(options?: LoaderOptions): Promise<TApiResponse<TSpecialDeal[]>> {
   const data = await fetchDocuments<SpecialDealsQueryResult[number]>(specialDealsQuery, {}, options);
   const mapped = data.map(mapSpecialDeal);
@@ -363,6 +370,7 @@ export const loaders = {
   getGalleryData,
   getHoursAndLocationData,
   getSpecialData,
+  getPageDataBySlug,
   getSpecialDealsData,
   getAnnouncementData,
   getAnnouncementPageData,

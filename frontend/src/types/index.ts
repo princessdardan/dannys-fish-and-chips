@@ -292,6 +292,16 @@ export type TSpecial = {
   blocks: LayoutBlock[];
 };
 
+export type TGenericPage = {
+  documentId: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  blocks: LayoutBlock[];
+};
+
 export interface IDealItem {
   id: number;
   name: string;
